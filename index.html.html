@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GadzLearn">
+<meta name="theme-color" content="#0b0c10">
+<title>GadzLearn — Cl224 & Cl225</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0c10;
+  --surface: #13151c;
+  --card: #1a1d28;
+  --card2: #20243300;
+  --accent: #f0c040;
+  --accent2: #4fa3ff;
+  --red: #f43f5e;
+  --green: #22c55e;
+  --text: #eef0f5;
+  --muted: #5a6070;
+  --border: #252838;
+  --cl225: #f0c040;
+  --cl224: #4fa3ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:6px 0 env(safe-area-inset-bottom);}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;border:none;background:none;color:var(--muted);transition:color .2s;}
+.nav-btn.active{color:var(--accent);}
+.nav-icon{font-size:22px;line-height:1;}
+.nav-label{font-size:10px;font-family:'Syne',sans-serif;font-weight:600;letter-spacing:.3px;}
+
+/* PAGES */
+.pages{height:100%;overflow:hidden;}
+.page{position:absolute;inset:0;bottom:65px;overflow-y:auto;display:none;flex-direction:column;}
+.page.active{display:flex;}
+
+/* HEADER COMMUN */
+.page-header{padding:16px 16px 10px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);}
+.page-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.page-title .hl{color:var(--accent);}
+
+/* ========== QUIZ ========== */
+.quiz-wrap{flex:1;display:flex;flex-direction:column;padding:16px;}
+
+.promo-filter{display:flex;gap:8px;margin-bottom:16px;}
+.pf-btn{flex:1;padding:10px;border-radius:12px;border:2px solid var(--border);background:var(--surface);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;}
+.pf-btn.active-225{border-color:var(--cl225);color:var(--cl225);}
+.pf-btn.active-224{border-color:var(--cl224);color:var(--cl224);}
+.pf-btn.active-all{border-color:var(--accent);color:var(--accent);}
+.pf-btn:not(.active-225):not(.active-224):not(.active-all){color:var(--muted);}
+
+.mode-select{display:flex;gap:8px;margin-bottom:20px;}
+.mode-btn{flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:12px;font-family:'Syne',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;}
+.mode-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+
+.card-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+
+.flashcard{width:100%;max-width:340px;min-height:220px;border-radius:20px;border:2px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;text-align:center;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden;}
+.flashcard:active{transform:scale(.97);}
+.flashcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(240,192,64,.05),transparent);pointer-events:none;}
+
+.fc-promo-tag{position:absolute;top:12px;right:12px;font-size:10px;font-family:'Syne',sans-serif;font-weight:700;padding:3px 8px;border-radius:20px;}
+.fc-promo-tag.t225{background:rgba(240,192,64,.15);color:var(--cl225);}
+.fc-promo-tag.t224{background:rgba(79,163,255,.15);color:var(--cl224);}
+
+.fc-question-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-family:'Syne',sans-serif;}
+.fc-question{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--text);line-height:1.1;margin-bottom:6px;}
+.fc-sub{font-size:13px;color:var(--muted);}
+
+.fc-answer{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);width:100%;}
+.fc-answer-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.fc-answer-val{font-size:20px;font-weight:600;color:var(--accent);}
+.fc-answer-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+
+.fc-hint{font-size:12px;color:var(--muted);margin-top:8px;}
+
+.avatar-big{width:80px;height:80px;border-radius:18px;object-fit:cover;margin-bottom:12px;border:2px solid var(--border);}
+.avatar-big-placeholder{width:80px;height:80px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#000;margin-bottom:12px;}
+
+.quiz-btns{display:flex;gap:12px;width:100%;max-width:340px;}
+.qbtn{flex:1;padding:14px;border-radius:14px;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .15s;}
+.qbtn:active{transform:scale(.96);}
+.qbtn.wrong{background:#2d1320;color:var(--red);border:2px solid var(--red);}
+.qbtn.right{background:#0f2d1a;color:var(--green);border:2px solid var(--green);}
+.qbtn.skip{background:var(--surface);color:var(--muted);border:2px solid var(--border);}
+.qbtn.next-btn{background:var(--accent);color:#000;}
+
+.progress-bar-wrap{width:100%;max-width:340px;background:var(--surface);border-radius:999px;height:6px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .3s;}
+
+.score-row{display:flex;gap:16px;width:100%;max-width:340px;justify-content:center;}
+.score-item{text-align:center;}
+.score-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.score-num.g{color:var(--green);}
+.score-num.r{color:var(--red);}
+.score-label{font-size:11px;color:var(--muted);}
+
+/* MCQ */
+.mcq-options{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px;}
+.mcq-opt{padding:14px 18px;border-radius:14px;border:2px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;font-family:'Syne',sans-serif;font-weight:600;cursor:pointer;text-align:left;transition:all .2s;}
+.mcq-opt:active{transform:scale(.98);}
+.mcq-opt.correct{background:#0f2d1a;border-color:var(--green);color:var(--green);}
+.mcq-opt.wrong{background:#2d1320;border-color:var(--red);color:var(--red);}
+.mcq-opt.disabled{pointer-events:none;opacity:.5;}
+
+/* ========== FAM'S VIEW ========== */
+.fams-header{padding:16px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);}
+.fams-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:12px;}
+.fams-title .hl{color:var(--accent);}
+.fam-promo-tabs{display:flex;gap:8px;}
+.fpt{flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;text-align:center;transition:all .2s;}
+.fpt.a225{background:rgba(240,192,64,.15);border-color:var(--cl225);color:var(--cl225);}
+.fpt.a224{background:rgba(79,163,255,.15);border-color:var(--cl224);color:var(--cl224);}
+.fpt:not(.a225):not(.a224){color:var(--muted);}
+
+.fams-list{padding:12px 12px 20px;}
+.fam-card{background:var(--card);border-radius:16px;border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+.fam-card-header{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;}
+.fam-num-badge{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#000;flex-shrink:0;}
+.fam-members-preview{display:flex;gap:-4px;flex:1;overflow:hidden;}
+.fam-member-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);}
+.fam-member-buque{font-size:12px;color:var(--muted);margin-top:1px;}
+.fam-expand-icon{color:var(--muted);font-size:18px;transition:transform .2s;flex-shrink:0;}
+.fam-card.open .fam-expand-icon{transform:rotate(90deg);}
+.fam-members-list{display:none;border-top:1px solid var(--border);}
+.fam-card.open .fam-members-list{display:block;}
+.fam-member-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.fam-member-row:last-child{border-bottom:none;}
+.fam-member-avatar{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+.fam-member-avatar-placeholder{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#000;flex-shrink:0;}
+.fam-member-info{flex:1;}
+.fam-member-fullname{font-size:13px;color:var(--muted);}
+
+/* ========== ANNUAIRE ========== */
+.annu-header{padding:14px 16px 10px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);}
+.annu-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.annu-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.annu-title span{color:var(--accent);}
+.counter{font-size:11px;color:var(--muted);background:var(--surface);padding:3px 10px;border-radius:20px;border:1px solid var(--border);}
+.search-wrap{position:relative;}
+.search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 16px 10px 38px;font-size:15px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap input::placeholder{color:var(--muted);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);}
+.annu-tabs{display:flex;gap:8px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;background:var(--bg);border-bottom:1px solid var(--border);}
+.annu-tabs::-webkit-scrollbar{display:none;}
+.atab{flex-shrink:0;padding:5px 13px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;}
+.atab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.annu-list{padding:10px 12px 20px;}
+.contact-card{display:flex;align-items:center;gap:12px;padding:12px;margin-bottom:7px;background:var(--card);border-radius:14px;border:1px solid var(--border);cursor:pointer;transition:transform .15s,border-color .15s;}
+.contact-card:active{transform:scale(.98);border-color:var(--accent);}
+.avatar-sm{width:46px;height:46px;border-radius:13px;object-fit:cover;flex-shrink:0;}
+.avatar-sm-ph{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#000;flex-shrink:0;}
+.card-info{flex:1;min-width:0;}
+.card-buque{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-fullname{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.fam-badge{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:3px 8px;font-size:11px;font-family:'Syne',sans-serif;font-weight:600;color:var(--accent);}
+.promo-dot{font-size:10px;font-family:'Syne',sans-serif;font-weight:700;padding:2px 6px;border-radius:20px;}
+.promo-dot.p225{background:rgba(240,192,64,.15);color:var(--cl225);}
+.promo-dot.p224{background:rgba(79,163,255,.15);color:var(--cl224);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:24px 24px 0 0;border:1px solid var(--border);padding:0 0 env(safe-area-inset-bottom,20px);width:100%;max-width:480px;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.modal-header{display:flex;align-items:center;gap:16px;padding:18px 24px;}
+.modal-avatar{width:64px;height:64px;border-radius:18px;object-fit:cover;flex-shrink:0;}
+.modal-avatar-ph{width:64px;height:64px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:#000;flex-shrink:0;}
+.modal-buque{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.modal-fullname{font-size:13px;color:var(--muted);margin-top:3px;}
+.modal-body{padding:0 24px;}
+.info-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border);}
+.info-row:last-child{border-bottom:none;}
+.info-icon{width:36px;height:36px;background:var(--surface);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.info-label{font-size:11px;color:var(--muted);}
+.info-value{font-size:15px;font-weight:500;margin-top:2px;}
+.call-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 24px 0;padding:15px;background:var(--accent);color:#000;border-radius:16px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;text-decoration:none;transition:opacity .15s;}
+.call-btn:active{opacity:.8;}
+
+/* PHOTO UPLOAD */
+.photo-section{padding:16px;}
+.photo-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px;}
+.photo-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.photo-search{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:15px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;width:100%;margin-bottom:12px;}
+.photo-search:focus{border-color:var(--accent);}
+.photo-list{display:flex;flex-direction:column;gap:10px;}
+.photo-row{display:flex;align-items:center;gap:14px;padding:12px;background:var(--card);border-radius:14px;border:1px solid var(--border);}
+.photo-preview{width:52px;height:52px;border-radius:12px;object-fit:cover;border:2px solid var(--border);cursor:pointer;flex-shrink:0;}
+.photo-preview-ph{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#000;cursor:pointer;flex-shrink:0;position:relative;}
+.photo-preview-ph::after{content:'📷';position:absolute;bottom:-4px;right:-4px;font-size:14px;background:var(--accent);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;}
+.photo-person-info{flex:1;}
+.photo-buque{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+.photo-fullname{font-size:12px;color:var(--muted);margin-top:2px;}
+.photo-upload-btn{padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.photo-upload-btn:hover{background:rgba(240,192,64,.1);border-color:var(--accent);}
+.photo-upload-input{display:none;}
+.stats-bar{display:flex;gap:16px;padding:10px 16px;font-size:12px;color:var(--muted);}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+
+/* CHALLENGE */
+.challenge-timer{font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1;transition:color .3s;}
+.challenge-timer.warning{color:var(--accent);}
+.challenge-timer.danger{color:var(--red);animation:pulse .5s ease-in-out infinite alternate;}
+@keyframes pulse{from{transform:scale(1);}to{transform:scale(1.08);}}
+.challenge-bar{width:100%;height:6px;background:var(--surface);border-radius:999px;overflow:hidden;margin-bottom:4px;}
+.challenge-bar-fill{height:100%;border-radius:999px;transition:width .1s linear,background .3s;}
+
+/* LEADERBOARD */
+.lb-card{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:8px;background:var(--card);border-radius:14px;border:1px solid var(--border);}
+.lb-rank{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;width:32px;text-align:center;flex-shrink:0;}
+.lb-rank.gold{color:#f0c040;}
+.lb-rank.silver{color:#aaa;}
+.lb-rank.bronze{color:#cd7f32;}
+.lb-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+.lb-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.lb-score{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--accent);margin-left:auto;}
+.lb-you{border-color:var(--accent);background:rgba(240,192,64,.06);}
+
+/* NICKNAME MODAL */
+.nick-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px;}
+.nick-overlay.open{display:flex;}
+.nick-box{background:var(--card);border-radius:20px;border:1px solid var(--border);padding:28px 24px;width:100%;max-width:360px;}
+.nick-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;}
+.nick-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.nick-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:16px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;margin-bottom:14px;}
+.nick-input:focus{border-color:var(--accent);}
+.nick-btn{width:100%;padding:14px;background:var(--accent);color:#000;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;cursor:pointer;}
+</style>
+</head>
+<body>
+<!-- NAV -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showPage('quiz')" id="nav-quiz">
+    <span class="nav-icon">🧠</span>
+    <span class="nav-label">Quiz</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('fams')" id="nav-fams">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Fam's</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('annu')" id="nav-annu">
+    <span class="nav-icon">📋</span>
+    <span class="nav-label">Annuaire</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('photos')" id="nav-photos">
+    <span class="nav-icon">📸</span>
+    <span class="nav-label">Photos</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('rank')" id="nav-rank">
+    <span class="nav-icon">🏆</span>
+    <span class="nav-label">Classement</span>
+  </button>
+</div>
+
+<div class="pages">
+
+<!-- ===== PAGE QUIZ ===== -->
+<div class="page active" id="page-quiz">
+  <div class="quiz-wrap">
+    <div class="promo-filter">
+      <button class="pf-btn active-all" data-promo="all" onclick="setPromoFilter(this)">Tous</button>
+      <button class="pf-btn" data-promo="Cl225" onclick="setPromoFilter(this)">Cl225</button>
+      <button class="pf-btn" data-promo="Cl224" onclick="setPromoFilter(this)">Cl224</button>
+    </div>
+    <div class="mode-select">
+      <button class="mode-btn active" data-mode="buque" onclick="setMode(this)">Buque→Nom</button>
+      <button class="mode-btn" data-mode="nom" onclick="setMode(this)">Nom→Buque</button>
+      <button class="mode-btn" data-mode="fam" onclick="setMode(this)">Fam's</button>
+      <button class="mode-btn" data-mode="mcq" onclick="setMode(this)">QCM</button>
+      <button class="mode-btn" data-mode="challenge" onclick="setMode(this)" style="background:rgba(244,63,94,.1);border-color:#f43f5e;color:#f43f5e;">⚡ Challenge</button>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="score-row" style="margin-top:10px;">
+      <div class="score-item"><div class="score-num g" id="scoreGood">0</div><div class="score-label">✅ Session</div></div>
+      <div class="score-item"><div class="score-num" id="scoreTotal" style="color:var(--muted)">0</div><div class="score-label">Total</div></div>
+      <div class="score-item"><div class="score-num r" id="scoreBad">0</div><div class="score-label">❌ Session</div></div>
+    </div>
+    <button onclick="showStats()" style="margin-top:8px;width:100%;max-width:340px;padding:9px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;">📊 Voir mes stats globales</button>
+
+    <div class="card-area" id="cardArea">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE FAM'S ===== -->
+<div class="page" id="page-fams">
+  <div class="fams-header">
+    <div class="fams-title">Les <span class="hl">Fam's</span></div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px;">Un ancien Cl224 + un conscrit Cl225 par fam's</div>
+    <div style="margin-top:10px;position:relative;">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);">🔍</span>
+      <input type="search" id="famSearch" placeholder="Chercher une fam's..." autocomplete="off"
+        style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 16px 10px 38px;font-size:14px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;"
+        oninput="renderFams()">
+    </div>
+  </div>
+  <div class="fams-list" id="famsList"></div>
+</div>
+
+<!-- ===== PAGE ANNUAIRE ===== -->
+<div class="page" id="page-annu">
+  <div class="annu-header">
+    <div class="annu-top">
+      <div class="annu-title">Annuaire <span>225+224</span></div>
+      <div class="counter" id="annuCounter">321</div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="search" id="annuSearch" placeholder="Buque, nom, prénom..." autocomplete="off">
+    </div>
+  </div>
+  <div class="annu-tabs" id="annuTabs">
+    <div class="atab active" data-sort="fam">Fam's</div>
+    <div class="atab" data-sort="nom">Nom</div>
+    <div class="atab" data-sort="buque">Buque</div>
+    <div class="atab" data-sort="promo">Promo</div>
+  </div>
+  <div class="annu-list" id="annuList"></div>
+</div>
+
+<!-- ===== PAGE PHOTOS ===== -->
+<div class="page" id="page-photos">
+  <div class="photo-section">
+    <div class="photo-title">📸 Photos de profil</div>
+    <div class="photo-sub">Ajoute une photo — elle est visible par toute la promo instantanément ☁️</div>
+    <input type="text" class="photo-search" id="photoSearch" placeholder="Chercher un gadz..." oninput="renderPhotos()" style="width:100%;margin-bottom:12px;">
+    <div id="cloudinaryStatus" style="margin-bottom:10px;font-size:12px;color:var(--muted);text-align:center;"></div>
+    <div class="photo-list" id="photoList"></div>
+  </div>
+</div>
+
+
+<!-- ===== PAGE CLASSEMENT ===== -->
+<div class="page" id="page-rank">
+  <div style="padding:16px 16px 10px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border);">
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;">🏆 <span style="color:var(--accent);">Classement</span></div>
+    <div style="font-size:12px;color:var(--muted);">Scores du mode Challenge (QCM · 60 secondes)</div>
+  </div>
+  <div style="padding:12px 12px 80px;" id="rankList">
+    <div class="empty" style="padding:40px 20px;text-align:center;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px;">⏱️</div>
+      <div>Lance un Challenge pour apparaître ici !</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /pages -->
+
+<!-- STATS MODAL -->
+<div class="modal-overlay" id="statsOverlay" onclick="if(event.target===this)this.classList.remove('open')" style="z-index:300;">
+  <div class="modal" style="max-height:80vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <div style="padding:18px 24px 0;">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px;">📊 Mes stats globales</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Sauvegardées sur cet appareil</div>
+    </div>
+    <div class="modal-body" id="statsBody" style="padding:0 24px 16px;"></div>
+    <div style="padding:0 24px 8px;display:flex;gap:10px;">
+      <button onclick="resetAllStats()" style="flex:1;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--red);font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;">🗑️ Reset stats</button>
+      <button onclick="document.getElementById('statsOverlay').classList.remove('open')" style="flex:2;padding:12px;background:var(--accent);border:none;border-radius:12px;color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div id="modalAvatarWrap"></div>
+      <div>
+        <div class="modal-buque" id="modalBuque"></div>
+        <div class="modal-fullname" id="modalFullname"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="info-row" id="modalFamRow">
+        <div class="info-icon">🏷️</div>
+        <div><div class="info-label">Fam's</div><div class="info-value" id="modalFam"></div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">🎓</div>
+        <div><div class="info-label">Promo</div><div class="info-value" id="modalPromo"></div></div>
+      </div>
+      <div class="info-row">
+        <div class="info-icon">📞</div>
+        <div><div class="info-label">Téléphone</div><div class="info-value" id="modalTel"></div></div>
+      </div>
+    </div>
+    <a class="call-btn" id="modalCallBtn" href="#">📞 Appeler</a>
+  </div>
+</div>
+
+<input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)">
+
+<!-- NICKNAME MODAL -->
+<div class="nick-overlay" id="nickOverlay">
+  <div class="nick-box">
+    <div class="nick-title">⚡ Mode Challenge</div>
+    <div class="nick-sub">Entre ton buque pour apparaître dans le classement !</div>
+    <input class="nick-input" id="nickInput" placeholder="Ton buque..." maxlength="30" autocomplete="off">
+    <button class="nick-btn" onclick="startChallenge()">C'est parti !</button>
+  </div>
+</div>
+
+<script>
+const ALL_CONTACTS = [{"buque": "Red Mountain", "fam": "1", "fam_num": 1, "prenom": "Clément", "nom": "MARTIN", "tel": "0782712211", "promo": "Cl225"}, {"buque": "Tabarnak", "fam": "2", "fam_num": 2, "prenom": "Clément", "nom": "NOCCHI", "tel": "0695333211", "promo": "Cl225"}, {"buque": "Oksen", "fam": "3", "fam_num": 3, "prenom": "Tom", "nom": "LASSERRE", "tel": "0767467598", "promo": "Cl225"}, {"buque": "Wilko", "fam": "4-23", "fam_num": 4, "prenom": "Adrien", "nom": "GAILLIARD", "tel": "0651748404", "promo": "Cl225"}, {"buque": "PUNISHARTS", "fam": "5", "fam_num": 5, "prenom": "Oscar", "nom": "DELETANG", "tel": "0651606589", "promo": "Cl225"}, {"buque": "Zorro", "fam": "6", "fam_num": 6, "prenom": "Lilia", "nom": "DJEMA", "tel": "0649292263", "promo": "Cl225"}, {"buque": "Pebble", "fam": "7", "fam_num": 7, "prenom": "Pierre", "nom": "PAILLUSON", "tel": "0645526741", "promo": "Cl225"}, {"buque": "aLYONKa", "fam": "8", "fam_num": 8, "prenom": "Alix", "nom": "AMOS", "tel": "0757434460", "promo": "Cl225"}, {"buque": "iggi ⛩️", "fam": "9", "fam_num": 9, "prenom": "Igor", "nom": "PAQUET", "tel": "0783389124", "promo": "Cl225"}, {"buque": "Goudale", "fam": "11", "fam_num": 11, "prenom": "Ludivine", "nom": "BRISEPIERRE BAILLY", "tel": "0788794466", "promo": "Cl225"}, {"buque": "Loupette", "fam": "12", "fam_num": 12, "prenom": "Laura", "nom": "LE PAGE", "tel": "0781573455", "promo": "Cl225"}, {"buque": "Ragnarts", "fam": "13", "fam_num": 13, "prenom": "Amaury", "nom": "CURE", "tel": "0699234480", "promo": "Cl225"}, {"buque": "LEKREX", "fam": "14", "fam_num": 14, "prenom": "Jassim", "nom": "KERROUA", "tel": "0782460587", "promo": "Cl225"}, {"buque": "Polaris", "fam": "15-106", "fam_num": 15, "prenom": "Alicia", "nom": "BERTHET", "tel": "0652267633", "promo": "Cl225"}, {"buque": "IK(ARTS)", "fam": "16", "fam_num": 16, "prenom": "Kiyan", "nom": "BAZIZ", "tel": "0633992794", "promo": "Cl225"}, {"buque": "Conway", "fam": "17", "fam_num": 17, "prenom": "Oscar", "nom": "AUDRY", "tel": "0769186205", "promo": "Cl225"}, {"buque": "COCYTUS", "fam": "18", "fam_num": 18, "prenom": "Jason", "nom": "AMMER", "tel": "0640877691", "promo": "Cl225"}, {"buque": "Galazio", "fam": "19", "fam_num": 19, "prenom": "Nicolas", "nom": "LEVY", "tel": "0646778510", "promo": "Cl225"}, {"buque": "fopadec'h", "fam": "20-192", "fam_num": 20, "prenom": "Benjamin", "nom": "DESTREMAU", "tel": "0767826699", "promo": "Cl225"}, {"buque": "Himmel", "fam": "21", "fam_num": 21, "prenom": "Ewan", "nom": "VERDEJO", "tel": "0782165872", "promo": "Cl225"}, {"buque": "Kaïros", "fam": "22", "fam_num": 22, "prenom": "Bastien", "nom": "LAPALUS", "tel": "0649597540", "promo": "Cl225"}, {"buque": "X'Plo", "fam": "24", "fam_num": 24, "prenom": "Thibault", "nom": "ROCHIGNEUX", "tel": "0601047885", "promo": "Cl225"}, {"buque": "LixA", "fam": "25", "fam_num": 25, "prenom": "Xavier", "nom": "MARCELINO", "tel": "0783280491", "promo": "Cl225"}, {"buque": "ARION", "fam": "26", "fam_num": 26, "prenom": "Sacha", "nom": "LE BASSARD", "tel": "0782597640", "promo": "Cl225"}, {"buque": "BLOOM", "fam": "27-146", "fam_num": 27, "prenom": "Betty", "nom": "MENDY", "tel": "0762128655", "promo": "Cl225"}, {"buque": "Nephylim", "fam": "28", "fam_num": 28, "prenom": "Charlotte", "nom": "DELMER", "tel": "0782886941", "promo": "Cl225"}, {"buque": "Friepin's", "fam": "29", "fam_num": 29, "prenom": "Nils", "nom": "KEYAERT", "tel": "0652257484", "promo": "Cl225"}, {"buque": "Tistou", "fam": "30", "fam_num": 30, "prenom": "Justine", "nom": "COUTROT", "tel": "0768612064", "promo": "Cl225"}, {"buque": "Bigeard", "fam": "31~50", "fam_num": 31, "prenom": "Augustin", "nom": "GARCIA DEGROLARD", "tel": "0788447106", "promo": "Cl225"}, {"buque": "Alba", "fam": "32", "fam_num": 32, "prenom": "Evangeline", "nom": "TAR", "tel": "0621043696", "promo": "Cl225"}, {"buque": "Pepperoni Pizza", "fam": "33", "fam_num": 33, "prenom": "Paul", "nom": "MICHELANGELI", "tel": "0769764333", "promo": "Cl225"}, {"buque": "L∞πng", "fam": "35", "fam_num": 35, "prenom": "Sam", "nom": "HUGONNIER", "tel": "0651000934", "promo": "Cl225"}, {"buque": "Doφ", "fam": "(36-176)", "fam_num": 36, "prenom": "Jules", "nom": "JACQUOT", "tel": "0768995990", "promo": "Cl225"}, {"buque": "MALTAZ'(ARTS)", "fam": "37", "fam_num": 37, "prenom": "Matthieu", "nom": "BLARET", "tel": "0616716357", "promo": "Cl225"}, {"buque": "KERLAINE", "fam": "39", "fam_num": 39, "prenom": "Oscar", "nom": "BARRAL", "tel": "0768396843", "promo": "Cl225"}, {"buque": "Genep", "fam": "40", "fam_num": 40, "prenom": "Louis", "nom": "THEVENOT", "tel": "0628841163", "promo": "Cl225"}, {"buque": "Z(ARTS)KEUM", "fam": "41", "fam_num": 41, "prenom": "Ronan", "nom": "KARST", "tel": "0634437116", "promo": "Cl225"}, {"buque": "La Malice", "fam": "42-70", "fam_num": 42, "prenom": "Joris", "nom": "VALLEIX", "tel": "0649279276", "promo": "Cl225"}, {"buque": "VERMITH(Arts)", "fam": "43", "fam_num": 43, "prenom": "Augustin", "nom": "DE ROFFIGNAC", "tel": "0698986186", "promo": "Cl225"}, {"buque": "Darcy", "fam": "44-188", "fam_num": 44, "prenom": "Tanguy", "nom": "AVENEL", "tel": "0618623899", "promo": "Cl225"}, {"buque": "Carnyx", "fam": "45", "fam_num": 45, "prenom": "Siméon", "nom": "CEJKA", "tel": "0685574230", "promo": "Cl225"}, {"buque": "YELLOWBIRD", "fam": "46", "fam_num": 46, "prenom": "Pierre", "nom": "ROUSSEL", "tel": "0785990602", "promo": "Cl225"}, {"buque": "STRATOS", "fam": "47", "fam_num": 47, "prenom": "Constantin", "nom": "RUELLE", "tel": "0604093789", "promo": "Cl225"}, {"buque": "DAWSON", "fam": "48", "fam_num": 48, "prenom": "Henri", "nom": "BERTHAUT", "tel": "0788135579", "promo": "Cl225"}, {"buque": "Birichina", "fam": "49-85", "fam_num": 49, "prenom": "Carla", "nom": "FREY", "tel": "0769701470", "promo": "Cl225"}, {"buque": "Nidaveli", "fam": "51", "fam_num": 51, "prenom": "Hinatea", "nom": "ANNONIER", "tel": "0782156226", "promo": "Cl225"}, {"buque": "πTOT", "fam": "52", "fam_num": 52, "prenom": "Thomas", "nom": "NOGUERRA", "tel": "0634116108", "promo": "Cl225"}, {"buque": "COPAL", "fam": "53", "fam_num": 53, "prenom": "Jules", "nom": "CHAMEROY", "tel": "0665715391", "promo": "Cl225"}, {"buque": "STIGMAN", "fam": "54", "fam_num": 54, "prenom": "Maury", "nom": "PROZELLER", "tel": "0656703073", "promo": "Cl225"}, {"buque": "JUNO", "fam": "55", "fam_num": 55, "prenom": "Sofia", "nom": "BOUBENDIR", "tel": "0768704342", "promo": "Cl225"}, {"buque": "Geox", "fam": "56-159", "fam_num": 56, "prenom": "Malo", "nom": "SOULAS", "tel": "0695156989", "promo": "Cl225"}, {"buque": "Melchisedek", "fam": "57", "fam_num": 57, "prenom": "Hugo", "nom": "PRIEUR", "tel": "0666112338", "promo": "Cl225"}, {"buque": "Rosemi's", "fam": "57-74", "fam_num": 57, "prenom": "Barbara", "nom": "MARZENCKA", "tel": "+48 667 739 621", "promo": "Cl225"}, {"buque": "Teqpaf", "fam": "58-10", "fam_num": 58, "prenom": "Charlène", "nom": "YOUSSFI", "tel": "0757411556", "promo": "Cl225"}, {"buque": "Krossette", "fam": "59-91", "fam_num": 59, "prenom": "Amir", "nom": "GOODWIN", "tel": "0652178127", "promo": "Cl225"}, {"buque": "RAPIDO", "fam": "60", "fam_num": 60, "prenom": "Laure", "nom": "DUPONT DE DINECHIN", "tel": "0769072641", "promo": "Cl225"}, {"buque": "Arren", "fam": "61", "fam_num": 61, "prenom": "Damien", "nom": "BARUSSAUD", "tel": "0783828705", "promo": "Cl225"}, {"buque": "JP", "fam": "62", "fam_num": 62, "prenom": "Nissa", "nom": "OZKARA", "tel": "0665978119", "promo": "Cl225"}, {"buque": "RAKI", "fam": "63", "fam_num": 63, "prenom": "Marie", "nom": "TOURNU", "tel": "0612074582", "promo": "Cl225"}, {"buque": "Med'llin", "fam": "64", "fam_num": 64, "prenom": "Yaëlle", "nom": "CHAN TSUNG YUN", "tel": "0615677016", "promo": "Cl225"}, {"buque": "Desma", "fam": "65", "fam_num": 65, "prenom": "Ambre", "nom": "DALENC", "tel": "0769392496", "promo": "Cl225"}, {"buque": "Nasdaq", "fam": "66", "fam_num": 66, "prenom": "Raphael", "nom": "BOSSART", "tel": "0766255072", "promo": "Cl225"}, {"buque": "AMOR", "fam": "68", "fam_num": 68, "prenom": "Romain", "nom": "VINCENT", "tel": "0787803520", "promo": "Cl225"}, {"buque": "Kral(art)'s", "fam": "69-105", "fam_num": 69, "prenom": "Jorys", "nom": "BOURBONNAIS", "tel": "0761831789", "promo": "Cl225"}, {"buque": "MONADO", "fam": "71", "fam_num": 71, "prenom": "Noé", "nom": "LACROIX", "tel": "0695024447", "promo": "Cl225"}, {"buque": "Physalie", "fam": "+72", "fam_num": 72, "prenom": "Xavier", "nom": "ROCHIGNEUX", "tel": "0645119121", "promo": "Cl225"}, {"buque": "Bivak", "fam": "74", "fam_num": 74, "prenom": "Timéo", "nom": "MORESTIN-CADET", "tel": "0667798512", "promo": "Cl225"}, {"buque": "BILLIG", "fam": "75", "fam_num": 75, "prenom": "Antoine", "nom": "MILLET", "tel": "0675503781", "promo": "Cl225"}, {"buque": "Slicks", "fam": "76", "fam_num": 76, "prenom": "Tom", "nom": "PYANET", "tel": "0674471803", "promo": "Cl225"}, {"buque": "Orianna", "fam": "77", "fam_num": 77, "prenom": "Aurélie", "nom": "PURGINA", "tel": "0781011955", "promo": "Cl225"}, {"buque": "Alias", "fam": "78", "fam_num": 78, "prenom": "Agathe", "nom": "ROLLAND", "tel": "0678591597", "promo": "Cl225"}, {"buque": "Kalonek", "fam": "80", "fam_num": 80, "prenom": "Clarisse", "nom": "TERPRAUT", "tel": "0613537689", "promo": "Cl225"}, {"buque": "Bas(art)", "fam": "81", "fam_num": 81, "prenom": "Bastien", "nom": "MATHIEU", "tel": "0783636026", "promo": "Cl225"}, {"buque": "WOODY", "fam": "82", "fam_num": 82, "prenom": "Romain", "nom": "BÉRINGUIER", "tel": "0651565098", "promo": "Cl225"}, {"buque": "Razow", "fam": "83", "fam_num": 83, "prenom": "Gaultier", "nom": "GRAVELIN", "tel": "0785976824", "promo": "Cl225"}, {"buque": "Guethenoc", "fam": "84", "fam_num": 84, "prenom": "Théo", "nom": "FIEVET", "tel": "0751631607", "promo": "Cl225"}, {"buque": "Cyganez", "fam": "i86", "fam_num": 86, "prenom": "Uliana", "nom": "DOMINGUEZ", "tel": "0768707162", "promo": "Cl225"}, {"buque": "Chappie", "fam": "87", "fam_num": 87, "prenom": "Rayan", "nom": "KNIPILER", "tel": "0658127762", "promo": "Cl225"}, {"buque": "Skitzo", "fam": "88", "fam_num": 88, "prenom": "Hugo", "nom": "PETROZZI", "tel": "0630247498", "promo": "Cl225"}, {"buque": "Fantome", "fam": "89-154", "fam_num": 89, "prenom": "Théodore", "nom": "DERRAC", "tel": "0767306268", "promo": "Cl225"}, {"buque": "KratΩs", "fam": "90-190", "fam_num": 90, "prenom": "Raed", "nom": "DARDOUR", "tel": "0695357561", "promo": "Cl225"}, {"buque": "Orora", "fam": "92", "fam_num": 92, "prenom": "Signan", "nom": "SORO", "tel": "0667476371", "promo": "Cl225"}, {"buque": "CRUZER", "fam": "93🦖183", "fam_num": 93, "prenom": "Augustin", "nom": "DE PORCARO", "tel": "0783758165", "promo": "Cl225"}, {"buque": "Bon Art's", "fam": "94-194", "fam_num": 94, "prenom": "Raphael", "nom": "AUGRIS", "tel": "0767682260", "promo": "Cl225"}, {"buque": "AZOTH", "fam": "95", "fam_num": 95, "prenom": "Diego", "nom": "ZOTT", "tel": "0687986518", "promo": "Cl225"}, {"buque": "NALLA", "fam": "96-153", "fam_num": 96, "prenom": "Marylou", "nom": "BOUSQUET", "tel": "0787488632", "promo": "Cl225"}, {"buque": "Dynamite", "fam": "97", "fam_num": 97, "prenom": "Solenne", "nom": "HARO", "tel": "0783191339", "promo": "Cl225"}, {"buque": "BLO", "fam": "98", "fam_num": 98, "prenom": "Basile", "nom": "LEENHARDT", "tel": "0781394484", "promo": "Cl225"}, {"buque": "NONO LA GRINTA", "fam": "99", "fam_num": 99, "prenom": "Esteban", "nom": "BOURDEIX-GAUTHIER", "tel": "0645520798", "promo": "Cl225"}, {"buque": "PALERS", "fam": "100", "fam_num": 100, "prenom": "Noé", "nom": "MOREL", "tel": "0650615784", "promo": "Cl225"}, {"buque": "CALENDO", "fam": "101-73", "fam_num": 101, "prenom": "Nathan", "nom": "VALLON", "tel": "0630899675", "promo": "Cl225"}, {"buque": "ARCH", "fam": "102", "fam_num": 102, "prenom": "Alexandre", "nom": "MOITIÉ", "tel": "0660859622", "promo": "Cl225"}, {"buque": "(arts)vi", "fam": "103-193", "fam_num": 103, "prenom": "Antoine", "nom": "CELESTIN", "tel": "0647113556", "promo": "Cl225"}, {"buque": "Hellazziah", "fam": "104", "fam_num": 104, "prenom": "Juliette", "nom": "BOESPFLUG", "tel": "0768443909", "promo": "Cl225"}, {"buque": "SILVERSTONE", "fam": "107&184", "fam_num": 107, "prenom": "Félix", "nom": "MESTRIC-GALLE", "tel": "0647381773", "promo": "Cl225"}, {"buque": "B(Arts)delite", "fam": "108", "fam_num": 108, "prenom": "Virgile", "nom": "GIRARD", "tel": "0658421855", "promo": "Cl225"}, {"buque": "MASHPROW", "fam": "109", "fam_num": 109, "prenom": "Etienne", "nom": "CLAUSON ALLARD", "tel": "0611501320", "promo": "Cl225"}, {"buque": "Cailloux", "fam": "110", "fam_num": 110, "prenom": "Clément", "nom": "DESLANDES", "tel": "0651889656", "promo": "Cl225"}, {"buque": "Hysteria", "fam": "111", "fam_num": 111, "prenom": "Lucie", "nom": "ALLÈGRE", "tel": "0611435176", "promo": "Cl225"}, {"buque": "Brembo", "fam": "112", "fam_num": 112, "prenom": "Gabin", "nom": "BESSET", "tel": "0781516571", "promo": "Cl225"}, {"buque": "Speedster", "fam": "113-182", "fam_num": 113, "prenom": "Antoine", "nom": "SANIAL", "tel": "0786408042", "promo": "Cl225"}, {"buque": "Teufel", "fam": "114", "fam_num": 114, "prenom": "Sascha", "nom": "BRAHMI", "tel": "0781516262", "promo": "Cl225"}, {"buque": "Pompl(Arts)", "fam": "115", "fam_num": 115, "prenom": "Valentin", "nom": "BRONDIN", "tel": "0786348350", "promo": "Cl225"}, {"buque": "F(arts)ina", "fam": "116", "fam_num": 116, "prenom": "Arthur", "nom": "VALÉAU", "tel": "0772182709", "promo": "Cl225"}, {"buque": "SUP'R'TRAMP", "fam": "117-143", "fam_num": 117, "prenom": "Jules", "nom": "COCHET", "tel": "0766411146", "promo": "Cl225"}, {"buque": "MAFATE", "fam": "118", "fam_num": 118, "prenom": "Hernàn", "nom": "ROY", "tel": "+262 693 02 17 26", "promo": "Cl225"}, {"buque": "Calypso", "fam": "119👑34", "fam_num": 119, "prenom": "Clémence", "nom": "DE TROGOFF", "tel": "0766034660", "promo": "Cl225"}, {"buque": "ALCÉA", "fam": "120", "fam_num": 120, "prenom": "Manon", "nom": "MONTAGNON", "tel": "0658009711", "promo": "Cl225"}, {"buque": "Lavray", "fam": "121-180", "fam_num": 121, "prenom": "Quentin", "nom": "LARUE", "tel": "0783755655", "promo": "Cl225"}, {"buque": "Makraw", "fam": "122", "fam_num": 122, "prenom": "Adrien", "nom": "ANTONI", "tel": "0649662873", "promo": "Cl225"}, {"buque": "Luther", "fam": "123", "fam_num": 123, "prenom": "Robin", "nom": "LASSÉE", "tel": "0769663515", "promo": "Cl225"}, {"buque": "PIZMO", "fam": "124", "fam_num": 124, "prenom": "Aleandro", "nom": "GIROLA", "tel": "0687718196", "promo": "Cl225"}, {"buque": "EIGER", "fam": "125", "fam_num": 125, "prenom": "Baptiste", "nom": "CHOPARD", "tel": "0760805031", "promo": "Cl225"}, {"buque": "Dolce", "fam": "126", "fam_num": 126, "prenom": "Roméo", "nom": "RANTY", "tel": "0781571036", "promo": "Cl225"}, {"buque": "(H)ART'(LOR)ᵗD", "fam": "127", "fam_num": 127, "prenom": "Orphée", "nom": "BARRAU", "tel": "0766202312", "promo": "Cl225"}, {"buque": "ZIMMER", "fam": "128", "fam_num": 128, "prenom": "Charles", "nom": "BONNET", "tel": "0635132993", "promo": "Cl225"}, {"buque": "Twilly", "fam": "129", "fam_num": 129, "prenom": "Clémence", "nom": "VERRIEST", "tel": "0667949984", "promo": "Cl225"}, {"buque": "Arthun", "fam": "130", "fam_num": 130, "prenom": "Paul", "nom": "TRINGALI", "tel": "0646598581", "promo": "Cl225"}, {"buque": "WanDer", "fam": "131", "fam_num": 131, "prenom": "Swann", "nom": "SIGNORET", "tel": "0770251770", "promo": "Cl225"}, {"buque": "JaliK[arts]", "fam": "132", "fam_num": 132, "prenom": "Antoine", "nom": "GILET", "tel": "0768964869", "promo": "Cl225"}, {"buque": "LEONE", "fam": "133", "fam_num": 133, "prenom": "Anthony", "nom": "ANELLI", "tel": "0768189943", "promo": "Cl225"}, {"buque": "MEGGIDO", "fam": "134", "fam_num": 134, "prenom": "Kenyl", "nom": "DIPEN JETHWA", "tel": "0744766349", "promo": "Cl225"}, {"buque": "Polar", "fam": "135", "fam_num": 135, "prenom": "Victor", "nom": "GARDET-OBERBACH", "tel": "0632011291", "promo": "Cl225"}, {"buque": "KAMEREON", "fam": "136", "fam_num": 136, "prenom": "Tom", "nom": "BOISSELEAU", "tel": "0688106988", "promo": "Cl225"}, {"buque": "DRUST", "fam": "137", "fam_num": 137, "prenom": "Tristan", "nom": "CAUCHIN", "tel": "0750981241", "promo": "Cl225"}, {"buque": "Dusky", "fam": "138", "fam_num": 138, "prenom": "Alexandre", "nom": "CLERC", "tel": "0664576971", "promo": "Cl225"}, {"buque": "Valérian", "fam": "139", "fam_num": 139, "prenom": "Quentin", "nom": "MONTABONNEL", "tel": "0766111534", "promo": "Cl225"}, {"buque": "Dinoco", "fam": "140", "fam_num": 140, "prenom": "Jarod", "nom": "CHAURÉ", "tel": "0782002888", "promo": "Cl225"}, {"buque": "ART'VELL", "fam": "141", "fam_num": 141, "prenom": "Loïs", "nom": "JOMIER", "tel": "0781287185", "promo": "Cl225"}, {"buque": "Luthen", "fam": "142-171", "fam_num": 142, "prenom": "Charles", "nom": "PERNAUDET", "tel": "0658518179", "promo": "Cl225"}, {"buque": "Winkyana", "fam": "144", "fam_num": 144, "prenom": "Soucouta-Sabel", "nom": "SONKO", "tel": "0662289948", "promo": "Cl225"}, {"buque": "Cl(Arts)té", "fam": "145", "fam_num": 145, "prenom": "Clémentine", "nom": "OLIVIER", "tel": "0674148989", "promo": "Cl225"}, {"buque": "Bacar's", "fam": "147", "fam_num": 147, "prenom": "Julien", "nom": "BAROULIER", "tel": "0783547970", "promo": "Cl225"}, {"buque": "Tarnished", "fam": "148", "fam_num": 148, "prenom": "Benjamin", "nom": "BURGONSE", "tel": "0776815516", "promo": "Cl225"}, {"buque": "Valdi", "fam": "149", "fam_num": 149, "prenom": "Pierre-Louis", "nom": "SCHUMACHER", "tel": "0629367661", "promo": "Cl225"}, {"buque": "Naimanir", "fam": "150", "fam_num": 150, "prenom": "Romain", "nom": "PERRET", "tel": "0767241247", "promo": "Cl225"}, {"buque": "Echo", "fam": "151", "fam_num": 151, "prenom": "Pablo", "nom": "VIENNE", "tel": "0768406435", "promo": "Cl225"}, {"buque": "Kiddo", "fam": "152", "fam_num": 152, "prenom": "Laure-Hélène", "nom": "RAHARIJAONA", "tel": "0695195378", "promo": "Cl225"}, {"buque": "VALYXAR", "fam": "155", "fam_num": 155, "prenom": "William", "nom": "FAN-COUPÉ", "tel": "0626947055", "promo": "Cl225"}, {"buque": "aetius", "fam": "156", "fam_num": 156, "prenom": "Paul", "nom": "TACCHINI", "tel": "0780371264", "promo": "Cl225"}, {"buque": "Torinox", "fam": "157", "fam_num": 157, "prenom": "Thibault", "nom": "MAZIÈRES", "tel": "0783363833", "promo": "Cl225"}, {"buque": "BeAM", "fam": "158-79", "fam_num": 158, "prenom": "Bérénice", "nom": "THIÉRART", "tel": "0695666901", "promo": "Cl225"}, {"buque": "PADMA", "fam": "160", "fam_num": 160, "prenom": "Pénélope", "nom": "MARTIN", "tel": "0618653982", "promo": "Cl225"}, {"buque": "WEAVER", "fam": "161", "fam_num": 161, "prenom": "Jules", "nom": "AILLOUD SORITA", "tel": "0769555505", "promo": "Cl225"}, {"buque": "Bivan", "fam": "162~>189", "fam_num": 162, "prenom": "Evan", "nom": "GHAFFAR", "tel": "0783868286", "promo": "Cl225"}, {"buque": "BOURBAKI", "fam": "163", "fam_num": 163, "prenom": "Félix", "nom": "MANENT", "tel": "0768002560", "promo": "Cl225"}, {"buque": "Chach", "fam": "164", "fam_num": 164, "prenom": "Charlotte", "nom": "TANCRÉ", "tel": "0651388425", "promo": "Cl225"}, {"buque": "Ronki", "fam": "165", "fam_num": 165, "prenom": "Simon", "nom": "CHARMETANT", "tel": "0628979178", "promo": "Cl225"}, {"buque": "La Buse", "fam": "166", "fam_num": 166, "prenom": "Thibault", "nom": "OLLAGNIER", "tel": "0766720872", "promo": "Cl225"}, {"buque": "Raf", "fam": "167", "fam_num": 167, "prenom": "Romain", "nom": "LAMORY", "tel": "0768453865", "promo": "Cl225"}, {"buque": "Kerridwen", "fam": "168", "fam_num": 168, "prenom": "Laetitia", "nom": "SEMPÉ", "tel": "0754356002", "promo": "Cl225"}, {"buque": "♠️ plume", "fam": "169", "fam_num": 169, "prenom": "Luc", "nom": "MEMBRÉ", "tel": "0745114321", "promo": "Cl225"}, {"buque": "Awaji", "fam": "172", "fam_num": 172, "prenom": "Jules", "nom": "MANUEL", "tel": "0644025506", "promo": "Cl225"}, {"buque": "ArtiΦis", "fam": "173", "fam_num": 173, "prenom": "Louis", "nom": "DUARTE", "tel": "0607167629", "promo": "Cl225"}, {"buque": "CERVIN", "fam": "174", "fam_num": 174, "prenom": "Gabin", "nom": "PRIEUR-DREVON", "tel": "0614056313", "promo": "Cl225"}, {"buque": "Cartman", "fam": "175", "fam_num": 175, "prenom": "Étienne", "nom": "DEL REY SÉGOVIA", "tel": "0785405769", "promo": "Cl225"}, {"buque": "Black Sirius", "fam": "177", "fam_num": 177, "prenom": "Lucien", "nom": "BOUCHET-VIRETTE", "tel": "0785069666", "promo": "Cl225"}, {"buque": "HALIFAX", "fam": "178", "fam_num": 178, "prenom": "Arthur", "nom": "FLEURY", "tel": "0783907924", "promo": "Cl225"}, {"buque": "πRHANA", "fam": "179", "fam_num": 179, "prenom": "Rémi", "nom": "LE BESNERAIS", "tel": "0768439130", "promo": "Cl225"}, {"buque": "ALBATOR", "fam": "181", "fam_num": 181, "prenom": "David", "nom": "MAZARD", "tel": "0637002700", "promo": "Cl225"}, {"buque": "Sterling", "fam": "𝐋𝐗𝐕𝐈𝐈", "fam_num": 9999, "prenom": "Gaspard", "nom": "VANNEY", "tel": "0769005169", "promo": "Cl225"}, {"buque": "COMET'S 38-170", "fam": "⭐", "fam_num": 9999, "prenom": "Célia", "nom": "BRUYÈRE", "tel": "0781543935", "promo": "Cl225"}, {"buque": "Celsius", "fam": "1", "fam_num": 1, "prenom": "Kelvin", "nom": "RIVIERE", "tel": "0651458618", "promo": "Cl224"}, {"buque": "MIFUNE", "fam": "2", "fam_num": 2, "prenom": "Nathan", "nom": "POULALION", "tel": "0673232098", "promo": "Cl224"}, {"buque": "Redbull", "fam": "3", "fam_num": 3, "prenom": "Tom", "nom": "TUPIN", "tel": "0769393608", "promo": "Cl224"}, {"buque": "Catalunya", "fam": "4-23", "fam_num": 4, "prenom": "Arthur", "nom": "FALGUERA", "tel": "0769885705", "promo": "Cl224"}, {"buque": "AKIMBO", "fam": "5", "fam_num": 5, "prenom": "Antonin", "nom": "EXERTIER", "tel": "0764031291", "promo": "Cl224"}, {"buque": "πThon", "fam": "5", "fam_num": 5, "prenom": "Louis", "nom": "POIRIER", "tel": "0620895741", "promo": "Cl224"}, {"buque": "Jerry", "fam": "6", "fam_num": 6, "prenom": "Carl", "nom": "BRUNET", "tel": "0643370080", "promo": "Cl224"}, {"buque": "Kopper", "fam": "7", "fam_num": 7, "prenom": "Octave", "nom": "PERRET", "tel": "0768332259", "promo": "Cl224"}, {"buque": "Kazlin", "fam": "8", "fam_num": 8, "prenom": "Sarah", "nom": "ADDERLEY", "tel": "0651464631", "promo": "Cl224"}, {"buque": "SAKAÏ ⛩️", "fam": "9", "fam_num": 9, "prenom": "Lounys", "nom": "RENAI", "tel": "0617527378", "promo": "Cl224"}, {"buque": "Doppelganger", "fam": "11", "fam_num": 11, "prenom": "Emilie", "nom": "DUPONT", "tel": "0749223849", "promo": "Cl224"}, {"buque": "PaddockSon", "fam": "12", "fam_num": 12, "prenom": "Marceau", "nom": "GOVART", "tel": "0785622917", "promo": "Cl224"}, {"buque": "Appolyon", "fam": "13", "fam_num": 13, "prenom": "Ugo", "nom": "DELMART", "tel": "0781789004", "promo": "Cl224"}, {"buque": "Volna", "fam": "14", "fam_num": 14, "prenom": "Maïwenn", "nom": "SEVENO", "tel": "0783940004", "promo": "Cl224"}, {"buque": "Samahël", "fam": "15-106", "fam_num": 15, "prenom": "Jean-Baptiste", "nom": "LE DANTEC", "tel": "0784750155", "promo": "Cl224"}, {"buque": "Chablis", "fam": "16", "fam_num": 16, "prenom": "Pierre", "nom": "MASSIAS", "tel": "0770262511", "promo": "Cl224"}, {"buque": "Meleph", "fam": "17", "fam_num": 17, "prenom": "Mathilde", "nom": "MOURET", "tel": "0601441914", "promo": "Cl224"}, {"buque": "Zona", "fam": "18", "fam_num": 18, "prenom": "Tom", "nom": "TALLOIS", "tel": "0677903293", "promo": "Cl224"}, {"buque": "Lucio", "fam": "19", "fam_num": 19, "prenom": "Ronan", "nom": "MALLASSINET", "tel": "0768166135", "promo": "Cl224"}, {"buque": "FOUMOU", "fam": "20-192", "fam_num": 20, "prenom": "Augustin", "nom": "LABRE", "tel": "0651662744", "promo": "Cl224"}, {"buque": "ARTHEOS", "fam": "21", "fam_num": 21, "prenom": "Théo", "nom": "MOUGEL", "tel": "0766840654", "promo": "Cl224"}, {"buque": "TIMBALE", "fam": "22", "fam_num": 22, "prenom": "Antonin", "nom": "BOYAVAL", "tel": "0619861795", "promo": "Cl224"}, {"buque": "HUDSON", "fam": "24", "fam_num": 24, "prenom": "Julien", "nom": "DULAC", "tel": "0641599731", "promo": "Cl224"}, {"buque": "Oneiros", "fam": "25", "fam_num": 25, "prenom": "Maël", "nom": "PERSIGNY", "tel": "0698883560", "promo": "Cl224"}, {"buque": "Pesto", "fam": "26", "fam_num": 26, "prenom": "Alexis", "nom": "DEL PESO", "tel": "0767232565", "promo": "Cl224"}, {"buque": "Fâyâti", "fam": "27-146", "fam_num": 27, "prenom": "Célia", "nom": "JOUAS", "tel": "0768293446", "promo": "Cl224"}, {"buque": "Ulul(Arts)", "fam": "28", "fam_num": 28, "prenom": "Simon", "nom": "FRANCOIS", "tel": "0786664217", "promo": "Cl224"}, {"buque": "Alpazeff", "fam": "29", "fam_num": 29, "prenom": "Pierre-Louis", "nom": "DUFFEZ", "tel": "0651606949", "promo": "Cl224"}, {"buque": "Colada", "fam": "30", "fam_num": 30, "prenom": "Fabien", "nom": "PINIER", "tel": "0682736382", "promo": "Cl224"}, {"buque": "BARWATRO'S", "fam": "31~50", "fam_num": 31, "prenom": "Nicolas", "nom": "BOISSIERE", "tel": "0780447183", "promo": "Cl224"}, {"buque": "OAZO", "fam": "32-60", "fam_num": 32, "prenom": "Antonin", "nom": "SKOWRON", "tel": "0780532830", "promo": "Cl224"}, {"buque": "Jumbo Burn", "fam": "33", "fam_num": 33, "prenom": "Thibault", "nom": "BERINGUIER", "tel": "0783074406", "promo": "Cl224"}, {"buque": "HOB(ARTS)", "fam": "35", "fam_num": 35, "prenom": "Bastien", "nom": "BRAIZE", "tel": "0637473724", "promo": "Cl224"}, {"buque": "LANIAKEA", "fam": "(36-176)", "fam_num": 36, "prenom": "Gabriel", "nom": "DAUBEUF", "tel": "0666199363", "promo": "Cl224"}, {"buque": "Mc Walter", "fam": "37", "fam_num": 37, "prenom": "Aymeric", "nom": "AGAESSE", "tel": "0768115805", "promo": "Cl224"}, {"buque": "Saφris", "fam": "39", "fam_num": 39, "prenom": "Bastien", "nom": "FOUCHEROT", "tel": "0661142207", "promo": "Cl224"}, {"buque": "ALTANA", "fam": "40", "fam_num": 40, "prenom": "Eline", "nom": "ARMENJON", "tel": "0695102828", "promo": "Cl224"}, {"buque": "ANDER'S", "fam": "41", "fam_num": 41, "prenom": "Luis", "nom": "SANGOUARD", "tel": "0769630759", "promo": "Cl224"}, {"buque": "REYNO", "fam": "42-70", "fam_num": 42, "prenom": "Yann", "nom": "BOUVIER", "tel": "0637352318", "promo": "Cl224"}, {"buque": "Slib(Arts)", "fam": "43", "fam_num": 43, "prenom": "Cyprien", "nom": "GAUTIER", "tel": "0768956173", "promo": "Cl224"}, {"buque": "Onyx", "fam": "44-188", "fam_num": 44, "prenom": "Elodie", "nom": "PECCOUX", "tel": "0651568454", "promo": "Cl224"}, {"buque": "Kyber", "fam": "45", "fam_num": 45, "prenom": "Victor", "nom": "THIBAULT", "tel": "0645654401", "promo": "Cl224"}, {"buque": "TEMPUS", "fam": "46", "fam_num": 46, "prenom": "Lucas", "nom": "ANDRE", "tel": "0695929008", "promo": "Cl224"}, {"buque": "Excelsis", "fam": "47", "fam_num": 47, "prenom": "Jean-Baptiste", "nom": "LENTZ", "tel": "0609502187", "promo": "Cl224"}, {"buque": "Jokars", "fam": "48", "fam_num": 48, "prenom": "Jonas", "nom": "VUILLEMIN", "tel": "0757552106", "promo": "Cl224"}, {"buque": "bayeK", "fam": "49-85", "fam_num": 49, "prenom": "Amine", "nom": "NOUIRA", "tel": "0695793633", "promo": "Cl224"}, {"buque": "Combrailloux", "fam": "51", "fam_num": 51, "prenom": "Julien", "nom": "JOUVE", "tel": "0786550442", "promo": "Cl224"}, {"buque": "BUMBEE", "fam": "52", "fam_num": 52, "prenom": "Ethan", "nom": "CHAUVIN", "tel": "0782668261", "promo": "Cl224"}, {"buque": "Pluto", "fam": "53-173", "fam_num": 53, "prenom": "Arthur", "nom": "PETOT", "tel": "0785809242", "promo": "Cl224"}, {"buque": "Fucar's", "fam": "54", "fam_num": 54, "prenom": "Maxence", "nom": "FUSARO", "tel": "0781564396", "promo": "Cl224"}, {"buque": "SASAE", "fam": "55", "fam_num": 55, "prenom": "Anne", "nom": "LAMIDIEU", "tel": "0683689572", "promo": "Cl224"}, {"buque": "BIBÉMUS", "fam": "56-159", "fam_num": 56, "prenom": "Vincent", "nom": "MONTERO", "tel": "0623160897", "promo": "Cl224"}, {"buque": "GOMORRA", "fam": "57", "fam_num": 57, "prenom": "Tylee", "nom": "JIGUET", "tel": "0783815280", "promo": "Cl224"}, {"buque": "Pleïade", "fam": "57-74", "fam_num": 57, "prenom": "Lena", "nom": "WROMBLESKA", "tel": "+48517226025", "promo": "Cl224"}, {"buque": "Reacio's", "fam": "58-10", "fam_num": 58, "prenom": "Julia", "nom": "PEDRO", "tel": "0760875298", "promo": "Cl224"}, {"buque": "Kamel", "fam": "59-91", "fam_num": 59, "prenom": "Sascha", "nom": "ROMER", "tel": "0783080070", "promo": "Cl224"}, {"buque": "Darnat's", "fam": "61", "fam_num": 61, "prenom": "Tsolinée", "nom": "ILIOZER", "tel": "0768490639", "promo": "Cl224"}, {"buque": "Lebowski", "fam": "63", "fam_num": 63, "prenom": "Sam", "nom": "JUQUEL", "tel": "0651581078", "promo": "Cl224"}, {"buque": "Lythos", "fam": "64", "fam_num": 64, "prenom": "Ethan", "nom": "GALLIOU", "tel": "0768262513", "promo": "Cl224"}, {"buque": "Rezki", "fam": "65", "fam_num": 65, "prenom": "Paul", "nom": "SEBAOUN", "tel": "0662368688", "promo": "Cl224"}, {"buque": "EXP(L'OR)", "fam": "66", "fam_num": 66, "prenom": "Mathis", "nom": "BREMOND", "tel": "0625113896", "promo": "Cl224"}, {"buque": "AIOLOS", "fam": "68", "fam_num": 68, "prenom": "Quentin", "nom": "SION", "tel": "0768899165", "promo": "Cl224"}, {"buque": "Fizz", "fam": "69-105", "fam_num": 69, "prenom": "Raphaël", "nom": "LAFITE", "tel": "0695398567", "promo": "Cl224"}, {"buque": "FLYNK", "fam": "71", "fam_num": 71, "prenom": "François", "nom": "AUDRY", "tel": "0679469685", "promo": "Cl224"}, {"buque": "FARMAN", "fam": "72", "fam_num": 72, "prenom": "Pierre", "nom": "WALLOIS", "tel": "0634666467", "promo": "Cl224"}, {"buque": "BOGUI", "fam": "74", "fam_num": 74, "prenom": "Guillaume", "nom": "DURY", "tel": "0768357755", "promo": "Cl224"}, {"buque": "Zango", "fam": "75", "fam_num": 75, "prenom": "Paul", "nom": "BOUTEMY", "tel": "0749092903", "promo": "Cl224"}, {"buque": "RIC(ARTS)", "fam": "76", "fam_num": 76, "prenom": "Paul", "nom": "PACAUT", "tel": "0629496180", "promo": "Cl224"}, {"buque": "NIVIDU'S", "fam": "77", "fam_num": 77, "prenom": "Ludivine", "nom": "MARCHAND F", "tel": "0771089755", "promo": "Cl224"}, {"buque": "BIFRÖST", "fam": "78", "fam_num": 78, "prenom": "Alan", "nom": "WENTZEL", "tel": "0769890185", "promo": "Cl224"}, {"buque": "Catena", "fam": "80", "fam_num": 80, "prenom": "Lise", "nom": "CHAINE", "tel": "0761347412", "promo": "Cl224"}, {"buque": "Nérée", "fam": "81", "fam_num": 81, "prenom": "David", "nom": "DUVERGE", "tel": "0620317042", "promo": "Cl224"}, {"buque": "COUNTACH", "fam": "82", "fam_num": 82, "prenom": "Maxence", "nom": "PION", "tel": "0778374563", "promo": "Cl224"}, {"buque": "Yonki", "fam": "83", "fam_num": 83, "prenom": "Henry", "nom": "LOYE", "tel": "0781185041", "promo": "Cl224"}, {"buque": "TURINI", "fam": "84☯️62", "fam_num": 84, "prenom": "Romain", "nom": "FOREST", "tel": "0695200488", "promo": "Cl224"}, {"buque": "Aladar", "fam": "i86", "fam_num": 86, "prenom": "Tanguy", "nom": "MARCHAND", "tel": "0762623153", "promo": "Cl224"}, {"buque": "Capella", "fam": "87", "fam_num": 87, "prenom": "Solenn", "nom": "CHARRIERE", "tel": "0769858188", "promo": "Cl224"}, {"buque": "NISSART'", "fam": "88", "fam_num": 88, "prenom": "Alexis", "nom": "ROUX", "tel": "0762455826", "promo": "Cl224"}, {"buque": "THANATOS", "fam": "89-154", "fam_num": 89, "prenom": "Benjamin", "nom": "BIALLAIS", "tel": "0651507424", "promo": "Cl224"}, {"buque": "Okay", "fam": "90-190", "fam_num": 90, "prenom": "Valentin", "nom": "GAMEIRO", "tel": "0609777755", "promo": "Cl224"}, {"buque": "Argonaute", "fam": "92", "fam_num": 92, "prenom": "Marco", "nom": "CAZAU", "tel": "0766099365", "promo": "Cl224"}, {"buque": "IRONPOP", "fam": "93🦖183", "fam_num": 93, "prenom": "Thibault", "nom": "JAUFFRET", "tel": "0781996523", "promo": "Cl224"}, {"buque": "Deme Trios", "fam": "94-194", "fam_num": 94, "prenom": "Julian", "nom": "BELLEMIN", "tel": "0769126334", "promo": "Cl224"}, {"buque": "ROMUS", "fam": "95", "fam_num": 95, "prenom": "Romain", "nom": "BOSSU", "tel": "0651546005", "promo": "Cl224"}, {"buque": "Scarlett", "fam": "96-153", "fam_num": 96, "prenom": "Margot", "nom": "CAMBE", "tel": "0781813109", "promo": "Cl224"}, {"buque": "Caïpi", "fam": "97", "fam_num": 97, "prenom": "Yildiz", "nom": "UNAT", "tel": "0766499277", "promo": "Cl224"}, {"buque": "Gajac", "fam": "98", "fam_num": 98, "prenom": "Mathys", "nom": "GARDETTE", "tel": "0652843152", "promo": "Cl224"}, {"buque": "FREDIDI", "fam": "99", "fam_num": 99, "prenom": "Ewan", "nom": "DUPRE", "tel": "0660144551", "promo": "Cl224"}, {"buque": "Nador", "fam": "100", "fam_num": 100, "prenom": "Vadim", "nom": "ARNE", "tel": "0782388096", "promo": "Cl224"}, {"buque": "DrakkarD", "fam": "101", "fam_num": 101, "prenom": "Théophile", "nom": "GARNIER", "tel": "0781552119", "promo": "Cl224"}, {"buque": "SUPERFLARE", "fam": "102", "fam_num": 102, "prenom": "Clément", "nom": "ROULLIER", "tel": "0786594553", "promo": "Cl224"}, {"buque": "Dayto", "fam": "103-193", "fam_num": 103, "prenom": "Paul", "nom": "BRIDOUX", "tel": "0675128494", "promo": "Cl224"}, {"buque": "Phédédjins", "fam": "104", "fam_num": 104, "prenom": "Inès", "nom": "BLONDEL", "tel": "0626332064", "promo": "Cl224"}, {"buque": "Pippin", "fam": "107&184", "fam_num": 107, "prenom": "Grégoire", "nom": "GUILPAIN", "tel": "0660817975", "promo": "Cl224"}, {"buque": "Skramar", "fam": "108", "fam_num": 108, "prenom": "Victor", "nom": "ALLAIRE", "tel": "0782641788", "promo": "Cl224"}, {"buque": "Wak(AM)", "fam": "109", "fam_num": 109, "prenom": "Aurélien", "nom": "LAFOY", "tel": "0787097552", "promo": "Cl224"}, {"buque": "MINOS", "fam": "110", "fam_num": 110, "prenom": "Hugo", "nom": "GUIPON", "tel": "0783653093", "promo": "Cl224"}, {"buque": "Straπ", "fam": "111", "fam_num": 111, "prenom": "Remi", "nom": "CHABERT", "tel": "0652862583", "promo": "Cl224"}, {"buque": "Santolux", "fam": "113-182", "fam_num": 113, "prenom": "Thomas", "nom": "HUGUENOT", "tel": "0652915584", "promo": "Cl224"}, {"buque": "Poirot", "fam": "114", "fam_num": 114, "prenom": "Jules", "nom": "CLERGET", "tel": "0628012948", "promo": "Cl224"}, {"buque": "AVTO", "fam": "115", "fam_num": 115, "prenom": "Adrien", "nom": "AUCLAIR", "tel": "0687318392", "promo": "Cl224"}, {"buque": "AzurDyne", "fam": "116", "fam_num": 116, "prenom": "Pablo", "nom": "CAMPS", "tel": "0760564910", "promo": "Cl224"}, {"buque": "Vedder", "fam": "117-143", "fam_num": 117, "prenom": "Eddy", "nom": "RACHEL", "tel": "0768914874", "promo": "Cl224"}, {"buque": "Lara Croft", "fam": "118", "fam_num": 118, "prenom": "Max", "nom": "FORQUET", "tel": "0778271013", "promo": "Cl224"}, {"buque": "Baydass", "fam": "119👑34", "fam_num": 119, "prenom": "Pierre", "nom": "GUILLERMET", "tel": "0769629080", "promo": "Cl224"}, {"buque": "Ahsoka", "fam": "120", "fam_num": 120, "prenom": "Lou", "nom": "SAUZEDDE", "tel": "0614667187", "promo": "Cl224"}, {"buque": "St Clar", "fam": "121-180", "fam_num": 121, "prenom": "Matthieu", "nom": "BRANDILY", "tel": "0782569375", "promo": "Cl224"}, {"buque": "WARANIKALAN", "fam": "122", "fam_num": 122, "prenom": "Aloïs", "nom": "GUYOT", "tel": "0612638064", "promo": "Cl224"}, {"buque": "P^3", "fam": "123", "fam_num": 123, "prenom": "Paul", "nom": "FUNARO", "tel": "0634031335", "promo": "Cl224"}, {"buque": "(H)ayat's", "fam": "124", "fam_num": 124, "prenom": "Abdenacer", "nom": "ATTOUCHI", "tel": "0753726304", "promo": "Cl224"}, {"buque": "COSMIC", "fam": "125", "fam_num": 125, "prenom": "Malo", "nom": "OLAGNE", "tel": "0782888481", "promo": "Cl224"}, {"buque": "AILEFROIDE", "fam": "126", "fam_num": 126, "prenom": "Thomas", "nom": "DUPONQ", "tel": "0615843715", "promo": "Cl224"}, {"buque": "TORX", "fam": "127", "fam_num": 127, "prenom": "Lucas", "nom": "DUBOURG", "tel": "0783575639", "promo": "Cl224"}, {"buque": "Ginkgo", "fam": "128", "fam_num": 128, "prenom": "Clément", "nom": "MILLOT", "tel": "0767076596", "promo": "Cl224"}, {"buque": "TARDIS", "fam": "129", "fam_num": 129, "prenom": "Léo", "nom": "FANDARD", "tel": "0782540642", "promo": "Cl224"}, {"buque": "ARPON", "fam": "130", "fam_num": 130, "prenom": "Matthieu", "nom": "TESTEIL", "tel": "0768081398", "promo": "Cl224"}, {"buque": "(Arts)théna", "fam": "131", "fam_num": 131, "prenom": "Marie", "nom": "DUROT", "tel": "0769389656", "promo": "Cl224"}, {"buque": "Ti'moría", "fam": "132", "fam_num": 132, "prenom": "Benoît", "nom": "OECHSLIN", "tel": "0622806065", "promo": "Cl224"}, {"buque": "Anaphi", "fam": "133", "fam_num": 133, "prenom": "Matisse", "nom": "STOLLER", "tel": "0661361614", "promo": "Cl224"}, {"buque": "LUB'S", "fam": "134", "fam_num": 134, "prenom": "Lubin", "nom": "GREGOIRE", "tel": "0695406288", "promo": "Cl224"}, {"buque": "Cahir", "fam": "135", "fam_num": 135, "prenom": "Corentin", "nom": "LAVILLE", "tel": "0612596823", "promo": "Cl224"}, {"buque": "ArtSky", "fam": "136", "fam_num": 136, "prenom": "Thomas", "nom": "PARDO", "tel": "0782634376", "promo": "Cl224"}, {"buque": "STILG(ARTS)", "fam": "137", "fam_num": 137, "prenom": "Thomas", "nom": "BENOIT", "tel": "0768373814", "promo": "Cl224"}, {"buque": "SHERBET", "fam": "138", "fam_num": 138, "prenom": "Malo", "nom": "BISSARDON", "tel": "0626329279", "promo": "Cl224"}, {"buque": "Eärendil", "fam": "139", "fam_num": 139, "prenom": "Axel", "nom": "MANNU", "tel": "0611141183", "promo": "Cl224"}, {"buque": "NOMAD", "fam": "140", "fam_num": 140, "prenom": "Jolan", "nom": "TISSERAND", "tel": "0767292824", "promo": "Cl224"}, {"buque": "LoewsteR", "fam": "141", "fam_num": 141, "prenom": "Larry", "nom": "SAINT MARCEL", "tel": "0619754104", "promo": "Cl224"}, {"buque": "VERSIN", "fam": "142-171", "fam_num": 142, "prenom": "Antoine", "nom": "PETIT", "tel": "0782495855", "promo": "Cl224"}, {"buque": "Bizon", "fam": "144", "fam_num": 144, "prenom": "Victor", "nom": "HIDALGO", "tel": "0627923395", "promo": "Cl224"}, {"buque": "Beyroüth", "fam": "145", "fam_num": 145, "prenom": "Jean-Georges", "nom": "KANAAN", "tel": "0663109687", "promo": "Cl224"}, {"buque": "TRESCO", "fam": "147", "fam_num": 147, "prenom": "Romain", "nom": "RAYSSAC", "tel": "0770427459", "promo": "Cl224"}, {"buque": "WCKD", "fam": "148", "fam_num": 148, "prenom": "Arthur", "nom": "PICHOIR", "tel": "0769180392", "promo": "Cl224"}, {"buque": "Mysterio", "fam": "149", "fam_num": 149, "prenom": "Marius", "nom": "REY", "tel": "0768855515", "promo": "Cl224"}, {"buque": "Pen'Arts", "fam": "150", "fam_num": 150, "prenom": "Daniel", "nom": "SENTIS", "tel": "0749078041", "promo": "Cl224"}, {"buque": "AURIOS", "fam": "151", "fam_num": 151, "prenom": "Joseph", "nom": "AURELLE", "tel": "0651611008", "promo": "Cl224"}, {"buque": "Mymir", "fam": "152", "fam_num": 152, "prenom": "Mehdi", "nom": "DEBBAH", "tel": "0786568726", "promo": "Cl224"}, {"buque": "Atos", "fam": "155", "fam_num": 155, "prenom": "Louis", "nom": "DOCQ", "tel": "0611879950", "promo": "Cl224"}, {"buque": "RIFE!N^(DJ)", "fam": "156", "fam_num": 156, "prenom": "Alex", "nom": "GROSLIER", "tel": "0783578376", "promo": "Cl224"}, {"buque": "Afon", "fam": "157", "fam_num": 157, "prenom": "Henri", "nom": "GUERIN", "tel": "0750006517", "promo": "Cl224"}, {"buque": "Bohürman", "fam": "158-79", "fam_num": 158, "prenom": "Enzo", "nom": "PIERRE", "tel": "0628560813", "promo": "Cl224"}, {"buque": "Copernic", "fam": "160", "fam_num": 160, "prenom": "Victor", "nom": "SITBON", "tel": "0658873431", "promo": "Cl224"}, {"buque": "Jolick", "fam": "161", "fam_num": 161, "prenom": "Erwin", "nom": "ORSET", "tel": "0773117251", "promo": "Cl224"}, {"buque": "VYKE", "fam": "162->189", "fam_num": 162, "prenom": "Mathias", "nom": "FERREIRA", "tel": "0612093299", "promo": "Cl224"}, {"buque": "BIEL'ARTS", "fam": "163", "fam_num": 163, "prenom": "Francois", "nom": "RIVES", "tel": "0667406324", "promo": "Cl224"}, {"buque": "CAPAC", "fam": "164", "fam_num": 164, "prenom": "Sebastian", "nom": "PIMENTEL", "tel": "CAPAC 164 Cl224 Sebastian PIMENTEL", "promo": "Cl224"}, {"buque": "Kingfishart", "fam": "165", "fam_num": 165, "prenom": "Martin", "nom": "MAWAS", "tel": "0769455865", "promo": "Cl224"}, {"buque": "Mich[ARTS]", "fam": "166", "fam_num": 166, "prenom": "Thibault", "nom": "GUERRE CHALEY", "tel": "0781843031", "promo": "Cl224"}, {"buque": "Autane", "fam": "167", "fam_num": 167, "prenom": "Rémi", "nom": "CEAS", "tel": "0782976176", "promo": "Cl224"}, {"buque": "ASTEGOS", "fam": "168", "fam_num": 168, "prenom": "David", "nom": "LABBE", "tel": "0677254049", "promo": "Cl224"}, {"buque": "LAMARTINE", "fam": "169", "fam_num": 169, "prenom": "Antonin", "nom": "AUBRY", "tel": "0652746242", "promo": "Cl224"}, {"buque": "Alhuïn", "fam": "172", "fam_num": 172, "prenom": "Romain", "nom": "PETERLONGO", "tel": "0769880084", "promo": "Cl224"}, {"buque": "(Arts)Bèn", "fam": "174", "fam_num": 174, "prenom": "Noé", "nom": "BOBILIER", "tel": "0766885847", "promo": "Cl224"}, {"buque": "Helm's", "fam": "175", "fam_num": 175, "prenom": "Mahel", "nom": "ESTEVES", "tel": "0783929326", "promo": "Cl224"}, {"buque": "triXma", "fam": "177", "fam_num": 177, "prenom": "Louis", "nom": "GABARRE", "tel": "0767178911", "promo": "Cl224"}, {"buque": "Zaï", "fam": "178", "fam_num": 178, "prenom": "Alexander", "nom": "REMERIJ", "tel": "0786516028", "promo": "Cl224"}, {"buque": "Personne", "fam": "179", "fam_num": 179, "prenom": "Mathias", "nom": "RIBEYRE", "tel": "0642770433", "promo": "Cl224"}, {"buque": "Koshm'Arts", "fam": "181", "fam_num": 181, "prenom": "Clément", "nom": "PAVANI", "tel": "0651256453", "promo": "Cl224"}, {"buque": "Meteor", "fam": "𝐋𝐗𝐕𝐈𝐈", "fam_num": 9999, "prenom": "Hugo", "nom": "DANIS", "tel": "0769481642", "promo": "Cl224"}, {"buque": "Sisko 38-170", "fam": "⭐", "fam_num": 9999, "prenom": "François", "nom": "BOUIX", "tel": "0611172324", "promo": "Cl224"}] ;
+
+// ============================================================
+// UTILS
+// ============================================================
+const COLORS = [
+  'linear-gradient(135deg,#f0c040,#f4a22d)',
+  'linear-gradient(135deg,#4fa3ff,#7c3aed)',
+  'linear-gradient(135deg,#f43f5e,#ec4899)',
+  'linear-gradient(135deg,#22c55e,#059669)',
+  'linear-gradient(135deg,#f97316,#ef4444)',
+  'linear-gradient(135deg,#8b5cf6,#6366f1)',
+  'linear-gradient(135deg,#06b6d4,#0891b2)',
+  'linear-gradient(135deg,#84cc16,#22c55e)',
+];
+function getColor(c) {
+  const str = c.buque || c.nom || '';
+  let h = 0;
+  for (let ch of str) h = ((h << 5) - h) + ch.charCodeAt(0);
+  return COLORS[Math.abs(h) % COLORS.length];
+}
+function getInitials(c) {
+  const src = c.buque || (c.prenom + ' ' + c.nom);
+  const clean = src.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').trim();
+  const words = clean.split(/\s+/);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return clean.slice(0, 2).toUpperCase() || '??';
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Photos stored in IndexedDB
+let photoDB = {};
+function loadPhotos() {
+  try { photoDB = JSON.parse(localStorage.getItem('gadz_photos') || '{}'); } catch(e) { photoDB = {}; }
+}
+function savePhotos() {
+  try { localStorage.setItem('gadz_photos', JSON.stringify(photoDB)); } catch(e) {}
+}
+loadPhotos();
+
+function getPhotoKey(c) { return c.promo + '_' + c.fam_num + '_' + c.nom; }
+function getPhoto(c) { return photoDB[getPhotoKey(c)] || null; }
+
+function avatarHTML(c, size='sm') {
+  const photo = getPhoto(c);
+  const cls = size === 'big' ? 'modal-avatar' : (size === 'fam' ? 'fam-member-avatar' : 'avatar-sm');
+  const phCls = size === 'big' ? 'modal-avatar-ph' : (size === 'fam' ? 'fam-member-avatar-placeholder' : 'avatar-sm-ph');
+  const sz = size === 'big' ? 64 : (size === 'fam' ? 40 : 46);
+  if (photo) {
+    return `<img src="${photo}" class="${cls}" style="width:${sz}px;height:${sz}px;" alt="">`;
+  }
+  return `<div class="${phCls}" style="background:${getColor(c)};width:${sz}px;height:${sz}px;">${getInitials(c)}</div>`;
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function showPage(id) {
+  // Redirect legacy 'classement' to 'rank'
+  if (id === 'classement') id = 'rank';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const navBtn = document.getElementById('nav-' + id);
+  if (navBtn) navBtn.classList.add('active');
+  if (id === 'fams') renderFams();
+  if (id === 'annu') renderAnnu();
+  if (id === 'photos') renderPhotos();
+  if (id === 'classement') renderClassement();
+  // Stop challenge timer when leaving quiz
+  if (id !== 'quiz') stopChallengeTimer();
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+let quizPromo = 'all';
+let quizMode = 'buque';
+let quizDeck = [];
+let quizIdx = 0;
+let quizRevealed = false;
+let scoreGood = 0, scoreBad = 0;
+let mcqAnswered = false;
+let currentPendingPhoto = null;
+
+// ============================================================
+// SCORE PERSISTENCE
+// ============================================================
+// scores[key] = { seen: N, correct: N, lastSeen: timestamp }
+// key = promo_famNum_nom_mode
+let globalScores = {};
+function loadScores() {
+  try { globalScores = JSON.parse(localStorage.getItem('gadz_scores') || '{}'); } catch(e) { globalScores = {}; }
+}
+function saveScores() {
+  try { localStorage.setItem('gadz_scores', JSON.stringify(globalScores)); } catch(e) {}
+}
+function scoreKey(c, mode) { return c.promo + '_' + c.fam_num + '_' + c.nom + '_' + mode; }
+function recordScore(c, mode, correct) {
+  const k = scoreKey(c, mode);
+  if (!globalScores[k]) globalScores[k] = { seen: 0, correct: 0, lastSeen: 0 };
+  globalScores[k].seen++;
+  if (correct) globalScores[k].correct++;
+  globalScores[k].lastSeen = Date.now();
+  saveScores();
+}
+function getMastery(c, mode) {
+  const k = scoreKey(c, mode);
+  const s = globalScores[k];
+  if (!s || s.seen === 0) return 0;
+  return Math.round(s.correct / s.seen * 100);
+}
+loadScores();
+
+function showStats() {
+  const body = document.getElementById('statsBody');
+  const modes = ['buque','nom','fam','mcq'];
+  const modeLabels = { buque:'Buque→Nom', nom:'Nom→Buque', fam:"Fam's", mcq:'QCM' };
+
+  // Overall stats per mode
+  let html = '';
+  modes.forEach(mode => {
+    const relevant = ALL_CONTACTS.filter(c => quizPromo === 'all' || c.promo === quizPromo);
+    const scored = relevant.filter(c => globalScores[scoreKey(c, mode)]);
+    const totalSeen = scored.length;
+    const mastered = scored.filter(c => getMastery(c, mode) >= 80).length;
+    const avgMastery = scored.length
+      ? Math.round(scored.reduce((sum, c) => sum + getMastery(c, mode), 0) / scored.length)
+      : 0;
+
+    const barW = avgMastery;
+    const barColor = avgMastery >= 80 ? 'var(--green)' : avgMastery >= 50 ? 'var(--accent)' : 'var(--red)';
+
+    html += `<div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;">${modeLabels[mode]}</span>
+        <span style="font-size:13px;color:var(--muted);">${mastered}/${relevant.length} maîtrisés</span>
+      </div>
+      <div style="background:var(--surface);border-radius:999px;height:8px;overflow:hidden;margin-bottom:4px;">
+        <div style="height:100%;width:${barW}%;background:${barColor};border-radius:999px;transition:width .5s;"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">${totalSeen} vus · ${avgMastery}% de réussite moyenne</div>
+    </div>`;
+  });
+
+  // Worst cards
+  const worstCards = ALL_CONTACTS
+    .map(c => {
+      const mode = quizMode;
+      const s = globalScores[scoreKey(c, mode)];
+      if (!s || s.seen < 2) return null;
+      return { c, mastery: getMastery(c, mode), seen: s.seen };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.mastery - b.mastery)
+    .slice(0, 5);
+
+  if (worstCards.length) {
+    html += `<div style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;">😬 À retravailler (mode actuel)</div>
+      ${worstCards.map(({ c, mastery, seen }) => `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:${getColor(c)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#000;flex-shrink:0;">${getInitials(c)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;">${esc(c.buque||c.prenom)}</div>
+            <div style="font-size:11px;color:var(--muted);">${seen} tentatives</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${mastery < 50 ? 'var(--red)' : 'var(--accent)'};">${mastery}%</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  // Best cards
+  const bestCards = ALL_CONTACTS
+    .map(c => {
+      const mode = quizMode;
+      const s = globalScores[scoreKey(c, mode)];
+      if (!s || s.seen < 2) return null;
+      return { c, mastery: getMastery(c, mode), seen: s.seen };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.mastery - a.mastery)
+    .slice(0, 5);
+
+  if (bestCards.length) {
+    html += `<div style="margin-top:8px;padding-top:16px;border-top:1px solid var(--border);">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:10px;">🏆 Les mieux retenus</div>
+      ${bestCards.map(({ c, mastery, seen }) => `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div style="width:38px;height:38px;border-radius:10px;background:${getColor(c)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:#000;flex-shrink:0;">${getInitials(c)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;">${esc(c.buque||c.prenom)}</div>
+            <div style="font-size:11px;color:var(--muted);">${seen} tentatives</div>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--green);">${mastery}%</div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  body.innerHTML = html;
+  document.getElementById('statsOverlay').classList.add('open');
+}
+
+function resetAllStats() {
+  if (!confirm('Effacer toutes les stats ?')) return;
+  globalScores = {};
+  saveScores();
+  showStats();
+}
+
+function setPromoFilter(btn) {
+  document.querySelectorAll('.pf-btn').forEach(b => {
+    b.classList.remove('active-all','active-225','active-224');
+  });
+  quizPromo = btn.dataset.promo;
+  if (quizPromo === 'all') btn.classList.add('active-all');
+  else if (quizPromo === 'Cl225') btn.classList.add('active-225');
+  else btn.classList.add('active-224');
+  resetQuiz();
+}
+
+// setMode replaced below
+
+function getFilteredDeck() {
+  let pool = quizPromo === 'all' ? ALL_CONTACTS : ALL_CONTACTS.filter(c => c.promo === quizPromo);
+  // Shuffle
+  return [...pool].sort(() => Math.random() - .5);
+}
+
+function resetQuiz() {
+  quizDeck = getFilteredDeck();
+  quizIdx = 0;
+  quizRevealed = false;
+  scoreGood = 0;
+  scoreBad = 0;
+  mcqAnswered = false;
+  updateScoreDisplay();
+  renderCard();
+}
+
+function updateScoreDisplay() {
+  document.getElementById('scoreGood').textContent = scoreGood;
+  document.getElementById('scoreBad').textContent = scoreBad;
+  document.getElementById('scoreTotal').textContent = quizDeck.length;
+  const pct = quizDeck.length ? (quizIdx / quizDeck.length * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function renderCard() {
+  if (quizMode === 'challenge') { renderChallengeCard(); return; }
+  const area = document.getElementById('cardArea');
+  if (quizIdx >= quizDeck.length) {
+    const pct = quizDeck.length ? Math.round(scoreGood / quizDeck.length * 100) : 0;
+    area.innerHTML = `
+      <div style="text-align:center;padding:20px;">
+        <div style="font-size:60px;margin-bottom:16px;">${pct >= 80 ? '🏆' : pct >= 50 ? '💪' : '📚'}</div>
+        <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);">${pct}%</div>
+        <div style="color:var(--muted);margin:8px 0 24px;">Tu as connu ${scoreGood}/${quizDeck.length}</div>
+        <button onclick="resetQuiz()" style="padding:14px 32px;background:var(--accent);color:#000;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:16px;cursor:pointer;">🔄 Recommencer</button>
+      </div>`;
+    return;
+  }
+
+  const c = quizDeck[quizIdx];
+  quizRevealed = false;
+  mcqAnswered = false;
+
+  if (quizMode === 'mcq') { renderMCQ(c, area); return; }
+
+  let qLabel, qVal, qSub, aLabel, aVal, aSub;
+  if (quizMode === 'buque') {
+    qLabel = 'Qui est ce gadz ?';
+    qVal = c.buque || '???';
+    qSub = `Promo ${c.promo}`;
+    aLabel = 'Nom complet';
+    aVal = c.prenom + ' ' + c.nom;
+    aSub = c.fam ? 'Fam\'s ' + c.fam : '';
+  } else if (quizMode === 'nom') {
+    qLabel = 'Quel est le buque ?';
+    qVal = c.prenom + ' ' + c.nom;
+    qSub = `Promo ${c.promo}`;
+    aLabel = 'Buque';
+    aVal = c.buque || '(aucun)';
+    aSub = c.fam ? 'Fam\'s ' + c.fam : '';
+  } else {
+    qLabel = 'À quelle fam\'s appartient-il ?';
+    qVal = c.buque || c.prenom;
+    qSub = c.prenom + ' ' + c.nom;
+    aLabel = 'Fam\'s';
+    aVal = c.fam || '—';
+    aSub = `Promo ${c.promo}`;
+  }
+
+  const photo = getPhoto(c);
+  const avatarBig = photo
+    ? `<img src="${photo}" style="width:80px;height:80px;border-radius:18px;object-fit:cover;margin-bottom:12px;border:2px solid var(--border);">`
+    : `<div style="width:80px;height:80px;border-radius:18px;background:${getColor(c)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#000;margin-bottom:12px;">${getInitials(c)}</div>`;
+
+  area.innerHTML = `
+    <div class="flashcard" onclick="revealCard()" id="flashcard">
+      <span class="fc-promo-tag ${c.promo === 'Cl225' ? 't225' : 't224'}">${c.promo}</span>
+      ${avatarBig}
+      <div class="fc-question-label">${esc(qLabel)}</div>
+      <div class="fc-question">${esc(qVal)}</div>
+      <div class="fc-sub">${esc(qSub)}</div>
+      <div id="masteryBadge" style="font-size:11px;margin-top:6px;"></div>
+      <div class="fc-answer" id="fcAnswer" style="display:none;">
+        <div class="fc-answer-label">${esc(aLabel)}</div>
+        <div class="fc-answer-val">${esc(aVal)}</div>
+        <div class="fc-answer-sub">${esc(aSub)}</div>
+      </div>
+      <div class="fc-hint" id="fcHint">👆 Touche pour révéler</div>
+    </div>
+    <div class="quiz-btns" id="quizBtns" style="display:none;">
+      <button class="qbtn wrong" onclick="markCard(false)">❌ Raté</button>
+      <button class="qbtn right" onclick="markCard(true)">✅ Connu</button>
+    </div>`;
+  updateScoreDisplay();
+  // Set mastery badge
+  requestAnimationFrame(() => {
+    const badge = document.getElementById('masteryBadge');
+    if (!badge) return;
+    const s = globalScores[scoreKey(c, quizMode)];
+    if (!s) { badge.textContent = '🆕 Première fois'; badge.style.color = 'var(--muted)'; return; }
+    const m = getMastery(c, quizMode);
+    const col = m >= 80 ? 'var(--green)' : m >= 50 ? 'var(--accent)' : 'var(--red)';
+    badge.textContent = 'Historique : ' + m + '% de réussite (' + s.seen + ' fois)';
+    badge.style.color = col;
+  });
+}
+
+function revealCard() {
+  if (quizRevealed) return;
+  quizRevealed = true;
+  document.getElementById('fcAnswer').style.display = 'block';
+  document.getElementById('fcHint').style.display = 'none';
+  document.getElementById('quizBtns').style.display = 'flex';
+}
+
+function markCard(correct) {
+  const c = quizDeck[quizIdx];
+  recordScore(c, quizMode, correct);
+  if (correct) scoreGood++; else scoreBad++;
+  quizIdx++;
+  renderCard();
+}
+
+function renderMCQ(c, area) {
+  // Prendre 3 mauvaises réponses
+  const pool = (quizPromo === 'all' ? ALL_CONTACTS : ALL_CONTACTS.filter(x => x.promo === quizPromo))
+    .filter(x => x !== c)
+    .sort(() => Math.random() - .5)
+    .slice(0, 3);
+
+  const correct = c.prenom + ' ' + c.nom;
+  const options = [...pool.map(x => x.prenom + ' ' + x.nom), correct].sort(() => Math.random() - .5);
+
+  const photo = getPhoto(c);
+  const avatarBig = photo
+    ? `<img src="${photo}" style="width:80px;height:80px;border-radius:18px;object-fit:cover;margin-bottom:12px;border:2px solid var(--border);">`
+    : `<div style="width:80px;height:80px;border-radius:18px;background:${getColor(c)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:#000;margin-bottom:12px;">${getInitials(c)}</div>`;
+
+  area.innerHTML = `
+    <div class="flashcard" style="cursor:default;">
+      <span class="fc-promo-tag ${c.promo === 'Cl225' ? 't225' : 't224'}">${c.promo}</span>
+      ${avatarBig}
+      <div class="fc-question-label">Qui est ce gadz ?</div>
+      <div class="fc-question">${esc(c.buque || c.prenom)}</div>
+    </div>
+    <div class="mcq-options" id="mcqOptions">
+      ${options.map(opt => `<button class="mcq-opt" onclick="answerMCQ(this,'${esc(opt)}','${esc(correct)}')">${esc(opt)}</button>`).join('')}
+    </div>`;
+  updateScoreDisplay();
+}
+
+function answerMCQ(btn, chosen, correct) {
+  if (mcqAnswered) return;
+  mcqAnswered = true;
+  document.querySelectorAll('.mcq-opt').forEach(b => {
+    b.classList.add('disabled');
+    if (b.textContent === correct) b.classList.add('correct');
+  });
+  const c = quizDeck[quizIdx];
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    scoreGood++;
+    recordScore(c, quizMode, true);
+  } else {
+    btn.classList.add('wrong');
+    scoreBad++;
+    recordScore(c, quizMode, false);
+  }
+  setTimeout(() => { quizIdx++; renderCard(); }, 1200);
+}
+
+// ============================================================
+// FAM'S
+// ============================================================
+function renderFams() {
+  const q = (document.getElementById('famSearch') ? document.getElementById('famSearch').value : '').toLowerCase();
+
+  // Grouper TOUS les contacts par fam_num (inter-promo)
+  const famMap = {};
+  ALL_CONTACTS.forEach(c => {
+    const key = c.fam_num;
+    if (!famMap[key]) famMap[key] = [];
+    famMap[key].push(c);
+  });
+
+  const keys = Object.keys(famMap).map(Number).sort((a, b) => a - b);
+
+  const el = document.getElementById('famsList');
+  el.innerHTML = keys.map((famNum, fi) => {
+    const members = famMap[famNum];
+    const cl225 = members.filter(c => c.promo === 'Cl225');
+    const cl224 = members.filter(c => c.promo === 'Cl224');
+
+    // Filter by search
+    if (q) {
+      const match = members.some(c =>
+        c.buque.toLowerCase().includes(q) || c.nom.toLowerCase().includes(q) ||
+        c.prenom.toLowerCase().includes(q) || String(c.fam).toLowerCase().includes(q)
+      );
+      if (!match) return '';
+    }
+
+    // Affichage duo côte à côte
+    const memberCols = [
+      { label: 'Cl225', list: cl225, color: '#f0c040', dotClass: 'p225' },
+      { label: 'Cl224', list: cl224, color: '#4fa3ff', dotClass: 'p224' },
+    ].map(({ label, list, color, dotClass }) => {
+      if (!list.length) return `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;">—</div>`;
+      return list.map(c => {
+        const photo = getPhoto(c);
+        const av = photo
+          ? `<img src="${photo}" style="width:44px;height:44px;border-radius:12px;object-fit:cover;border:2px solid ${color};">`
+          : `<div style="width:44px;height:44px;border-radius:12px;background:${getColor(c)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#000;border:2px solid ${color};">${getInitials(c)}</div>`;
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;">
+          ${av}
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;text-align:center;color:var(--text);">${esc(c.buque || c.prenom)}</div>
+          <div style="font-size:11px;color:var(--muted);text-align:center;">${esc(c.prenom)} ${esc(c.nom)}</div>
+          <div style="font-size:10px;font-family:'Syne',sans-serif;font-weight:700;padding:2px 7px;border-radius:20px;background:${color}22;color:${color};">${label}</div>
+        </div>`;
+      }).join('');
+    });
+
+    const famLabel = cl225[0]?.fam || cl224[0]?.fam || famNum;
+
+    return `<div class="fam-card" id="fam-card-${fi}">
+      <div class="fam-card-header" onclick="toggleFam('fam-card-${fi}')">
+        <div class="fam-num-badge" style="background:linear-gradient(135deg,#f0c040,#4fa3ff);font-size:13px;">${esc(String(famLabel))}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text);">
+            ${cl225.map(c => esc(c.buque||c.prenom)).join(' + ')}
+            <span style="color:var(--muted);font-weight:400;"> × </span>
+            ${cl224.map(c => esc(c.buque||c.prenom)).join(' + ')}
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${members.length} membre${members.length>1?'s':''}</div>
+        </div>
+        <span class="fam-expand-icon">›</span>
+      </div>
+      <div class="fam-members-list">
+        <div style="display:flex;border-top:1px solid var(--border);">
+          <div style="flex:1;text-align:center;padding:6px;font-size:11px;font-family:'Syne',sans-serif;font-weight:700;color:#f0c040;border-right:1px solid var(--border);">Cl225</div>
+          <div style="flex:1;text-align:center;padding:6px;font-size:11px;font-family:'Syne',sans-serif;font-weight:700;color:#4fa3ff;">Cl224</div>
+        </div>
+        <div style="display:flex;min-height:100px;">
+          ${memberCols.join('')}
+        </div>
+      </div>
+    </div>`;
+  }).filter(Boolean).join('');
+}
+
+function toggleFam(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ============================================================
+// ANNUAIRE
+// ============================================================
+let annuSort = 'fam';
+let annuQuery = '';
+
+function renderAnnu() {
+  const q = annuQuery.toLowerCase();
+  let list = ALL_CONTACTS.filter(c =>
+    !q || c.buque.toLowerCase().includes(q) || c.nom.toLowerCase().includes(q) ||
+    c.prenom.toLowerCase().includes(q) || c.fam.toLowerCase().includes(q)
+  );
+  list = [...list].sort((a, b) => {
+    if (annuSort === 'fam') return a.fam_num - b.fam_num;
+    if (annuSort === 'nom') return a.nom.localeCompare(b.nom, 'fr');
+    if (annuSort === 'buque') return a.buque.localeCompare(b.buque, 'fr');
+    if (annuSort === 'promo') return a.promo.localeCompare(b.promo);
+  });
+
+  document.getElementById('annuCounter').textContent = list.length;
+  const el = document.getElementById('annuList');
+  if (!list.length) { el.innerHTML = '<div class="empty">Aucun résultat</div>'; return; }
+
+  el.innerHTML = list.map(c => {
+    const idx = ALL_CONTACTS.indexOf(c);
+    const photo = getPhoto(c);
+    const av = photo
+      ? `<img src="${photo}" class="avatar-sm" alt="">`
+      : `<div class="avatar-sm-ph" style="background:${getColor(c)}">${getInitials(c)}</div>`;
+    return `<div class="contact-card" onclick="openModal(${idx})">
+      ${av}
+      <div class="card-info">
+        <div class="card-buque">${esc(c.buque || c.prenom)}</div>
+        <div class="card-fullname">${esc(c.prenom)} ${esc(c.nom)}</div>
+      </div>
+      <div class="card-right">
+        ${c.fam ? `<div class="fam-badge">${esc(c.fam)}</div>` : ''}
+        <div class="promo-dot ${c.promo === 'Cl225' ? 'p225' : 'p224'}">${c.promo}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('annuSearch').addEventListener('input', e => {
+  annuQuery = e.target.value;
+  renderAnnu();
+});
+document.querySelectorAll('.atab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.atab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    annuSort = tab.dataset.sort;
+    renderAnnu();
+  });
+});
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(idx) {
+  const c = ALL_CONTACTS[idx];
+  const photo = getPhoto(c);
+  const wrap = document.getElementById('modalAvatarWrap');
+  if (photo) {
+    wrap.innerHTML = `<img src="${photo}" class="modal-avatar" style="width:64px;height:64px;">`;
+  } else {
+    wrap.innerHTML = `<div class="modal-avatar-ph" style="background:${getColor(c)};width:64px;height:64px;">${getInitials(c)}</div>`;
+  }
+  document.getElementById('modalBuque').textContent = c.buque || (c.prenom + ' ' + c.nom);
+  document.getElementById('modalFullname').textContent = c.prenom + ' ' + c.nom;
+  document.getElementById('modalFam').textContent = c.fam || '—';
+  document.getElementById('modalFamRow').style.display = c.fam ? 'flex' : 'none';
+  document.getElementById('modalPromo').textContent = c.promo;
+  document.getElementById('modalTel').textContent = c.tel || '—';
+  const btn = document.getElementById('modalCallBtn');
+  if (c.tel) { btn.href = 'tel:' + c.tel.replace(/\s/g,''); btn.style.display='flex'; }
+  else btn.style.display='none';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function openLightbox(src, caption) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxCaption').textContent = caption || '';
+  lb.style.display = 'flex';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
+// ============================================================
+// CLOUDINARY CONFIG
+// ============================================================
+// Config Cloudinary pré-remplie — les utilisateurs n'ont rien à faire
+let cloudinaryConfig = {
+  cloudName: 'dt9n7f3pz',
+  uploadPreset: 'gadz_unsigned'
+};
+function loadCloudinaryConfig() {
+  // Config fixe, pas besoin de localStorage
+  updateCloudinaryStatus();
+}
+
+function updateCloudinaryStatus() {
+  const el = document.getElementById('cloudinaryStatus');
+  if (!el) return;
+  el.innerHTML = '☁️ Photos partagées entre toute la promo';
+  el.style.color = 'var(--green)';
+}
+loadCloudinaryConfig();
+
+// ============================================================
+// PHOTOS
+// ============================================================
+// Cache des URLs Cloudinary vérifiées
+const cloudCache = {};
+
+function getCloudinaryUrl(c) {
+  if (!cloudinaryConfig.cloudName) return null;
+  const key = c.promo + '_' + c.fam_num + '_' + c.nom.replace(/\s/g, '_');
+  return 'https://res.cloudinary.com/' + cloudinaryConfig.cloudName + '/image/upload/w_200,h_200,c_fill,g_face/gadz_photos/' + key;
+}
+
+function getPhoto(c) {
+  // Priorité : photo locale > Cloudinary
+  return photoDB[getPhotoKey(c)] || null;
+}
+
+function getPhotoSrc(c, callback) {
+  const local = photoDB[getPhotoKey(c)];
+  if (local) { callback(local); return; }
+  const url = getCloudinaryUrl(c);
+  if (!url) { callback(null); return; }
+  const key = getPhotoKey(c);
+  if (cloudCache[key] !== undefined) { callback(cloudCache[key] ? url : null); return; }
+  // Test if image exists
+  const img = new Image();
+  img.onload = () => { cloudCache[key] = true; callback(url); };
+  img.onerror = () => { cloudCache[key] = false; callback(null); };
+  img.src = url;
+}
+
+function renderPhotos() {
+  const q = (document.getElementById('photoSearch').value || '').toLowerCase();
+  const list = ALL_CONTACTS.filter(c =>
+    !q || c.buque.toLowerCase().includes(q) || c.nom.toLowerCase().includes(q) || c.prenom.toLowerCase().includes(q)
+  );
+
+  const el = document.getElementById('photoList');
+  el.innerHTML = list.map(c => {
+    const key = getPhotoKey(c);
+    const local = photoDB[key];
+    const cloudUrl = getCloudinaryUrl(c);
+    const photoSrc = local || (cloudCache[key] ? cloudUrl : null);
+    const caption = esc(c.buque || c.prenom) + ' · ' + esc(c.prenom) + ' ' + esc(c.nom);
+    const av = photoSrc
+      ? `<img src="${photoSrc}" class="photo-preview" onclick="openLightbox('${photoSrc}','${caption}')" alt="" style="width:52px;height:52px;border-radius:12px;object-fit:cover;border:2px solid var(--border);cursor:pointer;">`
+      : `<div class="photo-preview-ph" style="background:${getColor(c)};width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#000;cursor:pointer;position:relative;" onclick="triggerUpload('${key}')">${getInitials(c)}<span style="position:absolute;bottom:-4px;right:-4px;font-size:14px;background:var(--accent);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;">📷</span></div>`;
+    return `<div class="photo-row" id="pr-${key}">
+      ${av}
+      <div class="photo-person-info">
+        <div class="photo-buque">${esc(c.buque || c.prenom)}</div>
+        <div class="photo-fullname">${esc(c.prenom)} ${esc(c.nom)} · ${esc(c.promo)}</div>
+      </div>
+      <button class="photo-upload-btn" onclick="triggerUpload('${key}')">📷 ${photoSrc ? 'Changer' : 'Ajouter'}</button>
+    </div>`;
+  }).join('');
+
+  // Lazy load Cloudinary images
+  if (cloudinaryConfig.cloudName) {
+    list.forEach(c => {
+      const key = getPhotoKey(c);
+      if (!photoDB[key] && cloudCache[key] === undefined) {
+        getPhotoSrc(c, src => {
+          if (src) {
+            const row = document.getElementById('pr-' + key);
+            if (row) {
+              const av = row.querySelector('.photo-preview-ph, .photo-preview');
+              if (av) {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = 'photo-preview';
+                img.style.cssText = 'width:52px;height:52px;border-radius:12px;object-fit:cover;border:2px solid var(--border);cursor:pointer;';
+                const cap = (ALL_CONTACTS.find(x => getPhotoKey(x) === key) || {});
+                const capStr = (cap.buque || cap.prenom || '') + ' · ' + (cap.prenom||'') + ' ' + (cap.nom||'');
+                img.onclick = () => openLightbox(src, capStr);
+                av.replaceWith(img);
+                // Update button
+                const btn = row.querySelector('.photo-upload-btn');
+                if (btn) btn.textContent = '📷 Changer';
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+}
+
+function triggerUpload(key) {
+  currentPendingPhoto = key;
+  document.getElementById('photoFileInput').click();
+}
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file || !currentPendingPhoto) return;
+
+  const c = ALL_CONTACTS.find(x => getPhotoKey(x) === currentPendingPhoto);
+
+  // Resize image
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 400;
+      let w = img.width, h = img.height;
+      const ratio = Math.min(MAX/w, MAX/h, 1);
+      w = Math.round(w * ratio); h = Math.round(h * ratio);
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const blob64 = canvas.toDataURL('image/jpeg', 0.8);
+
+      // Always save locally first
+      photoDB[currentPendingPhoto] = blob64;
+      savePhotos();
+      renderPhotos();
+      if (document.getElementById('page-quiz').classList.contains('active')) renderCard();
+
+      // If Cloudinary configured, also upload to share with everyone
+      if (cloudinaryConfig.cloudName && cloudinaryConfig.uploadPreset) {
+        uploadToCloudinary(canvas, c);
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function uploadToCloudinary(canvas, c) {
+  const key = c.promo + '_' + c.fam_num + '_' + c.nom.replace(/\s/g, '_');
+  canvas.toBlob(blob => {
+    const formData = new FormData();
+    formData.append('file', blob, key + '.jpg');
+    formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+    formData.append('public_id', 'gadz_photos/' + key);
+    formData.append('folder', 'gadz_photos');
+
+    const statusEl = document.getElementById('cloudinaryStatus');
+    if (statusEl) { statusEl.textContent = '⬆️ Upload en cours...'; statusEl.style.color = 'var(--accent)'; }
+
+    fetch('https://api.cloudinary.com/v1_1/' + cloudinaryConfig.cloudName + '/image/upload', {
+      method: 'POST', body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.secure_url) {
+        cloudCache[getPhotoKey(c)] = true;
+        if (statusEl) { statusEl.innerHTML = '✅ Photo partagée avec toute la promo !'; statusEl.style.color = 'var(--green)'; }
+        setTimeout(updateCloudinaryStatus, 3000);
+      }
+    })
+    .catch(() => {
+      if (statusEl) { statusEl.textContent = '⚠️ Upload Cloudinary échoué (photo sauvée localement)'; statusEl.style.color = 'var(--red)'; }
+      setTimeout(updateCloudinaryStatus, 3000);
+    });
+  }, 'image/jpeg', 0.8);
+}
+
+// ============================================================
+// CHALLENGE MODE
+// ============================================================
+const CHALLENGE_TIME = 60; // secondes
+const CHALLENGE_QUESTIONS = 20;
+let challengeTimer = null;
+let challengeTimeLeft = CHALLENGE_TIME;
+let challengeScore = 0;
+let challengeIdx = 0;
+let challengeDeck = [];
+let challengeNick = '';
+let challengeAnswered = false;
+
+function setMode(btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  quizMode = btn.dataset.mode;
+  if (quizMode === 'challenge') {
+    // Ask nickname first
+    challengeNick = localStorage.getItem('gadz_nick') || '';
+    if (challengeNick) document.getElementById('nickInput').value = challengeNick;
+    document.getElementById('nickOverlay').classList.add('open');
+  } else {
+    stopChallengeTimer();
+    resetQuiz();
+  }
+}
+
+function startChallenge() {
+  const nick = document.getElementById('nickInput').value.trim();
+  if (!nick) { document.getElementById('nickInput').focus(); return; }
+  challengeNick = nick;
+  localStorage.setItem('gadz_nick', nick);
+  document.getElementById('nickOverlay').classList.remove('open');
+  resetQuiz();
+}
+
+function stopChallengeTimer() {
+  if (challengeTimer) { clearInterval(challengeTimer); challengeTimer = null; }
+}
+
+function renderChallengeCard() {
+  const area = document.getElementById('cardArea');
+  const pool = (quizPromo === 'all' ? ALL_CONTACTS : ALL_CONTACTS.filter(c => c.promo === quizPromo));
+  challengeDeck = [...pool].sort(() => Math.random() - .5).slice(0, CHALLENGE_QUESTIONS);
+  challengeScore = 0;
+  challengeIdx = 0;
+  challengeAnswered = false;
+  challengeTimeLeft = CHALLENGE_TIME;
+  stopChallengeTimer();
+
+  renderOneChallengeQ();
+
+  challengeTimer = setInterval(() => {
+    challengeTimeLeft--;
+    const fill = document.getElementById('challengeBarFill');
+    const timerEl = document.getElementById('challengeTimerNum');
+    if (fill) {
+      const pct = (challengeTimeLeft / CHALLENGE_TIME * 100);
+      const col = challengeTimeLeft > 20 ? 'var(--green)' : challengeTimeLeft > 10 ? 'var(--accent)' : 'var(--red)';
+      fill.style.width = pct + '%';
+      fill.style.background = col;
+    }
+    if (timerEl) {
+      timerEl.textContent = challengeTimeLeft;
+      timerEl.className = 'challenge-timer' + (challengeTimeLeft <= 10 ? ' danger' : challengeTimeLeft <= 20 ? ' warning' : '');
+    }
+    if (challengeTimeLeft <= 0) {
+      stopChallengeTimer();
+      showChallengeResult();
+    }
+  }, 1000);
+}
+
+function renderOneChallengeQ() {
+  if (challengeIdx >= challengeDeck.length) { stopChallengeTimer(); showChallengeResult(); return; }
+  const area = document.getElementById('cardArea');
+  const c = challengeDeck[challengeIdx];
+  challengeAnswered = false;
+
+  const pool = (quizPromo === 'all' ? ALL_CONTACTS : ALL_CONTACTS.filter(x => x.promo === quizPromo))
+    .filter(x => x !== c).sort(() => Math.random() - .5).slice(0, 3);
+  const correct = c.buque || c.prenom;
+  const options = [...pool.map(x => x.buque || x.prenom), correct].sort(() => Math.random() - .5);
+
+  const photo = getPhoto(c);
+  const av = photo
+    ? `<img src="${photo}" style="width:72px;height:72px;border-radius:16px;object-fit:cover;margin-bottom:10px;border:2px solid var(--border);">`
+    : `<div style="width:72px;height:72px;border-radius:16px;background:${getColor(c)};display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:#000;margin-bottom:10px;">${getInitials(c)}</div>`;
+
+  area.innerHTML = `
+    <div style="width:100%;max-width:340px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div>
+          <div class="challenge-bar"><div id="challengeBarFill" class="challenge-bar-fill" style="width:100%;background:var(--green);"></div></div>
+          <div style="font-size:11px;color:var(--muted);">${challengeIdx + 1}/${CHALLENGE_QUESTIONS} · Score : ${challengeScore}</div>
+        </div>
+        <div class="challenge-timer" id="challengeTimerNum">${challengeTimeLeft}</div>
+      </div>
+      <div style="background:var(--card);border-radius:20px;border:2px solid var(--border);padding:20px;text-align:center;margin-bottom:14px;">
+        <span class="fc-promo-tag ${c.promo === 'Cl225' ? 't225' : 't224'}" style="position:relative;top:auto;right:auto;display:inline-block;margin-bottom:10px;">${c.promo}</span>
+        ${av}
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'Syne',sans-serif;">Quel est son buque ?</div>
+        <div style="font-size:16px;font-weight:500;margin-top:4px;">${esc(c.prenom)} ${esc(c.nom)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${options.map(opt => `<button class="mcq-opt" style="padding:12px 16px;" onclick="answerChallenge(this,'${esc(opt)}','${esc(correct)}')">${esc(opt)}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function answerChallenge(btn, chosen, correct) {
+  if (challengeAnswered) return;
+  challengeAnswered = true;
+  document.querySelectorAll('.mcq-opt').forEach(b => {
+    b.classList.add('disabled');
+    if (b.textContent === correct) b.classList.add('correct');
+  });
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    challengeScore++;
+  } else {
+    btn.classList.add('wrong');
+  }
+  setTimeout(() => {
+    challengeIdx++;
+    if (challengeTimeLeft > 0 && challengeIdx < challengeDeck.length) {
+      renderOneChallengeQ();
+    } else {
+      stopChallengeTimer();
+      showChallengeResult();
+    }
+  }, 700);
+}
+
+function showChallengeResult() {
+  const pct = Math.round(challengeScore / Math.max(challengeIdx, 1) * 100);
+  const area = document.getElementById('cardArea');
+  const emoji = challengeScore >= 18 ? '🏆' : challengeScore >= 12 ? '💪' : challengeScore >= 6 ? '📚' : '😅';
+
+  area.innerHTML = `
+    <div style="text-align:center;padding:10px;width:100%;max-width:340px;">
+      <div style="font-size:64px;margin-bottom:12px;">${emoji}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--accent);">${challengeScore}/${challengeIdx}</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:6px;">${pct}% de réussite</div>
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--text);margin-bottom:24px;">
+        ${challengeNick ? '"' + esc(challengeNick) + '"' : 'Anonyme'}
+      </div>
+      <button onclick="submitScore(${challengeScore}, ${challengeIdx})" style="width:100%;padding:14px;background:var(--accent);color:#000;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px;" id="submitBtn">
+        📤 Publier mon score
+      </button>
+      <button onclick="renderChallengeCard()" style="width:100%;padding:14px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:14px;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;cursor:pointer;">
+        🔄 Rejouer
+      </button>
+    </div>`;
+}
+
+// ============================================================
+// LEADERBOARD via Cloudinary (JSON stored as image metadata)
+// ============================================================
+// On stocke le leaderboard comme un fichier JSON uploadé sur Cloudinary
+const LB_PUBLIC_ID = 'gadz_leaderboard/scores';
+const CLOUD_NAME = 'dt9n7f3pz';
+const UPLOAD_PRESET = 'gadz_unsigned';
+
+async function fetchLeaderboard() {
+  try {
+    // Fetch via Cloudinary raw file URL with cache bust
+    const url = `https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/${LB_PUBLIC_ID}.json?t=${Date.now()}`;
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return Array.isArray(data) ? data : [];
+  } catch(e) { return []; }
+}
+
+async function submitScore(score, total) {
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.textContent = '⏳ Publication...'; btn.disabled = true; }
+
+  // Get current leaderboard
+  let lb = await fetchLeaderboard();
+
+  const entry = {
+    nick: challengeNick || 'Anonyme',
+    score,
+    total,
+    pct: Math.round(score / Math.max(total, 1) * 100),
+    promo: quizPromo,
+    date: new Date().toLocaleDateString('fr-FR'),
+    ts: Date.now()
+  };
+
+  // Update or add
+  const existing = lb.findIndex(e => e.nick.toLowerCase() === entry.nick.toLowerCase());
+  if (existing >= 0) {
+    if (entry.score > lb[existing].score) lb[existing] = entry; // Keep best
+  } else {
+    lb.push(entry);
+  }
+  lb.sort((a, b) => b.score - a.score);
+  lb = lb.slice(0, 50); // Max 50 entries
+
+  // Upload JSON as raw file
+  const jsonBlob = new Blob([JSON.stringify(lb)], { type: 'application/json' });
+  const fd = new FormData();
+  fd.append('file', jsonBlob, 'scores.json');
+  fd.append('upload_preset', UPLOAD_PRESET);
+  fd.append('public_id', LB_PUBLIC_ID);
+  fd.append('resource_type', 'raw');
+  fd.append('invalidate', 'true');
+
+  try {
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`, { method:'POST', body:fd });
+    const data = await r.json();
+    if (data.secure_url) {
+      if (btn) { btn.textContent = '✅ Score publié !'; btn.style.background = 'var(--green)'; }
+      setTimeout(() => { showPage('classement'); }, 1200);
+    } else {
+      throw new Error('Upload failed');
+    }
+  } catch(e) {
+    if (btn) { btn.textContent = '❌ Erreur, réessaie'; btn.disabled = false; }
+  }
+}
+
+async function renderClassement() {
+  const el = document.getElementById('classementList');
+  el.innerHTML = '<div class="empty">⏳ Chargement...</div>';
+
+  const lb = await fetchLeaderboard();
+
+  if (!lb.length) {
+    el.innerHTML = `<div class="empty">
+      <div style="font-size:48px;margin-bottom:12px;">🏆</div>
+      <div style="font-size:16px;margin-bottom:8px;">Aucun score encore !</div>
+      <div style="font-size:13px;color:var(--muted);">Lance le mode Challenge et sois le premier 🚀</div>
+    </div>`;
+    return;
+  }
+
+  const myNick = (localStorage.getItem('gadz_nick') || '').toLowerCase();
+  const medals = ['🥇','🥈','🥉'];
+  const rankClasses = ['gold','silver','bronze'];
+
+  el.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <button onclick="renderClassement()" style="float:right;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;">🔄 Actualiser</button>
+      <div style="font-size:12px;color:var(--muted);padding-top:8px;">${lb.length} participant${lb.length > 1 ? 's' : ''}</div>
+    </div>
+    ${lb.map((e, i) => {
+      const isMe = e.nick.toLowerCase() === myNick;
+      const medal = i < 3 ? medals[i] : (i + 1);
+      const rankCls = i < 3 ? rankClasses[i] : '';
+      return `<div class="lb-card ${isMe ? 'lb-you' : ''}">
+        <div class="lb-rank ${rankCls}">${medal}</div>
+        <div>
+          <div class="lb-name">${esc(e.nick)} ${isMe ? '<span style="font-size:10px;background:var(--accent);color:#000;padding:2px 6px;border-radius:20px;font-family:Syne,sans-serif;font-weight:700;">TOI</span>' : ''}</div>
+          <div class="lb-sub">${e.pct}% · ${e.score}/${e.total} · ${e.promo === 'all' ? 'Tous' : e.promo} · ${e.date}</div>
+        </div>
+        <div class="lb-score">${e.score}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+resetQuiz();
+renderAnnu();
+</script>
+
+<!-- PHOTO LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.92);align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+  <img id="lightboxImg" src="" style="max-width:92vw;max-height:80vh;border-radius:16px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,.8);">
+  <div id="lightboxCaption" style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:#fff;text-align:center;"></div>
+  <div style="font-size:12px;color:rgba(255,255,255,.4);">Touche pour fermer</div>
+</div>
+
+<!-- PWA INSTALL BANNER -->
+<div id="installBanner" style="display:none;position:fixed;bottom:70px;left:12px;right:12px;z-index:150;background:var(--card);border:1px solid var(--accent);border-radius:16px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span style="font-size:28px;">🎓</span>
+    <div style="flex:1;">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;">Installer GadzLearn</div>
+      <div style="font-size:12px;color:var(--muted);">Ajouter à l'écran d'accueil</div>
+    </div>
+    <button id="installBtn" style="padding:8px 16px;background:var(--accent);color:#000;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">Installer</button>
+    <button onclick="document.getElementById('installBanner').style.display='none'" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 4px;">✕</button>
+  </div>
+</div>
+
+<script>
+// PWA Install prompt — only show when browser triggers it
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Only show if not already installed
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (!isStandalone) document.getElementById('installBanner').style.display = 'block';
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').style.display = 'none';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').style.display = 'none';
+});
+
+// Register service worker for offline support
+if ('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'gadzlearn-v1';
+    const ASSETS = ['.'];
+    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))));
+    self.addEventListener('fetch', e => e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('.')))
+    ));
+  `;
+  const blob = new Blob([swCode], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl, { scope: './' }).catch(() => {});
+}
+</script>
+</body>
+</html>
